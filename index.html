@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Mapa do Conhecimento</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #f5deb3, #d2b48c, #cd853f);
+      background-attachment: fixed;
+      font-family: "Georgia", serif;
+      color: #4a2c0f;
+      margin: 0;
+      padding: 0;
+    }
+    #mapa {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      /* Ajuste para garantir que haja espaço para os pontos sem scroll inicial */
+      min-height: 700px; /* Um valor mínimo para começar */
+    }
+    .ponto {
+      position: absolute;
+      cursor: pointer;
+      font-weight: bold;
+      background: rgba(255, 248, 220, 0.9);
+      border: 2px solid #5a3e1b;
+      padding: 5px 10px;
+      border-radius: 8px;
+      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s;
+      color: #4a2c0f;
+      text-align: center;
+      white-space: nowrap; /* Evita quebras de linha no nome do ponto */
+      font-size: 0.9em; /* Tamanho da fonte menor para caber mais nomes */
+    }
+    .ponto:hover {
+      transform: scale(1.1);
+      z-index: 10; /* Garante que o ponto em foco esteja acima dos outros */
+    }
+    #conteudo {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      max-height: 50vh;
+      overflow-y: auto;
+      background-color: rgba(245, 222, 179, 0.95);
+      padding: 20px;
+      border-top: 4px solid #5a3e1b;
+      display: none;
+      box-sizing: border-box;
+      z-index: 20; /* Garante que o conteúdo apareça acima do mapa */
+    }
+    #conteudo h2 {
+      color: #5a3e1b;
+      margin-top: 0;
+    }
+    #conteudo p {
+      line-height: 1.6;
+    }
+    .quiz-container {
+      margin-top: 20px;
+      border-top: 1px dashed #5a3e1b;
+      padding-top: 15px;
+    }
+    .quiz-container button {
+        display: block;
+        width: 100%;
+        margin-bottom: 5px;
+        background-color: #8b5e3c;
+        color: #fff;
+        border: none;
+        padding: 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.2s;
+    }
+    .quiz-container button:hover {
+        background-color: #6a442a;
+    }
+    .quiz-navigation button {
+        background-color: #5a3e1b;
+        margin-right: 10px;
+        width: auto;
+        padding: 8px 15px; /* Ajuste no padding para botões de navegação */
+    }
+    .quiz-navigation button:hover {
+        background-color: #3b2816;
+    }
+  </style>
+</head>
+<body>
+  <div id="mapa">
+    <div class="ponto" style="top: 10%; left: 10%;" onclick="abrirConteudo('historia-independencia')">Independência do Brasil</div>
+    <div class="ponto" style="top: 20%; left: 15%;" onclick="abrirConteudo('historia-constituicao1824')">Constituição (1824)</div>
+    <div class="ponto" style="top: 30%; left: 12%;" onclick="abrirConteudo('historia-confederacao')">Confederação do Equador</div>
+    <div class="ponto" style="top: 40%; left: 20%;" onclick="abrirConteudo('historia-guardaNacional')">Guarda Nacional</div>
+    <div class="ponto" style="top: 50%; left: 15%;" onclick="abrirConteudo('historia-atoAdicional')">Ato Adicional</div>
+    <div class="ponto" style="top: 60%; left: 10%;" onclick="abrirConteudo('historia-cabanagem')">Cabanagem</div>
+    <div class="ponto" style="top: 70%; left: 18%;" onclick="abrirConteudo('historia-farroupilha')">R. Farroupilha</div>
+    <div class="ponto" style="top: 80%; left: 13%;" onclick="abrirConteudo('historia-balaiada')">Balaiada</div>
+
+    <div class="ponto" style="top: 10%; left: 40%;" onclick="abrirConteudo('filosofia-preSocraticos')">Filosofia Pré-Socrática</div>
+    <div class="ponto" style="top: 20%; left: 45%;" onclick="abrirConteudo('filosofia-heraclito')">Heráclito e o Devir</div>
+    <div class="ponto" style="top: 30%; left: 42%;" onclick="abrirConteudo('filosofia-parmenides')">Parmênides: O Ser Imóvel</div>
+    <div class="ponto" style="top: 40%; left: 48%;" onclick="abrirConteudo('filosofia-sofistas')">Sofistas: Arte de Argumentar</div>
+    <div class="ponto" style="top: 50%; left: 43%;" onclick="abrirConteudo('filosofia-pitagoras')">Pitágoras</div>
+    <div class="ponto" style="top: 60%; left: 40%;" onclick="abrirConteudo('filosofia-gorgias')">Górgias</div>
+    <div class="ponto" style="top: 70%; left: 45%;" onclick="abrirConteudo('filosofia-metodoSocratico')">Método Socrático</div>
+    <div class="ponto" style="top: 80%; left: 42%;" onclick="abrirConteudo('filosofia-socrates')">Sócrates</div>
+    <div class="ponto" style="top: 15%; left: 55%;" onclick="abrirConteudo('filosofia-buscaConceito')">Busca pelo Conceito</div>
+    <div class="ponto" style="top: 25%; left: 60%;" onclick="abrirConteudo('filosofia-teoriaIdeias')">Teoria das Ideias (Platão)</div>
+    <div class="ponto" style="top: 35%; left: 57%;" onclick="abrirConteudo('filosofia-filosofiaPrimeiro')">A Filosofia Primeira (Aristóteles)</div>
+    <div class="ponto" style="top: 45%; left: 62%;" onclick="abrirConteudo('filosofia-4causas')">Teoria das 4 Causas</div>
+    <div class="ponto" style="top: 55%; left: 59%;" onclick="abrirConteudo('filosofia-feRazao')">Europa Crist. Fé e Razão</div>
+<div class="ponto" style="top: 10%; left: 75%;" onclick="abrirConteudo('sociologia-bullyingCyberbullying')">Bullying e Cyberbullying</div>
+    <div class="ponto" style="top: 20%; left: 78%;" onclick="abrirConteudo('sociologia-abusoExploracaoSexual')">Abuso e Exploração Sexual</div>
+    <div class="ponto" style="top: 30%; left: 64%;" onclick="abrirConteudo('sociologia-capitalismo')">Capitalismo</div>
+    <div class="ponto" style="top: 30%; left: 75%;" onclick="abrirConteudo('geo-meioAmbientePatrimonioGenetico')">Patrimônio Genético</div>
+    <div class="ponto" style="top: 40%; left: 78%;" onclick="abrirConteudo('geo-meioAmbienteNoBrasil')">Meio Ambiente no Brasil</div>
+    <div class="ponto" style="top: 50%; left: 75%;" onclick="abrirConteudo('geo-principaisProblemasAmbientais')">Problemas Ambientais</div>
+    <div class="ponto" style="top: 60%; left: 78%;" onclick="abrirConteudo('geo-principaisDestinosRequisitos')">Principais Destinos e Requisitos</div>
+    <div class="ponto" style="top: 50%; left: 75%;" onclick="abrirConteudo('geo-principaisProblemasAmbientais')">Geografia: Principais Problemas Ambientais</div>
+    <div class="ponto" style="top: 60%; left: 78%;" onclick="abrirConteudo('geo-principaisDestinosRequisitos')">Geografia: Principais Destinos e Requisitos</div>
+    </div>
+
+  <div id="conteudo"></div>
+
+  <script>
+    const estudados = {};
+    let quizAtual = {};
+    let perguntaAtualIndex = 0;
+
+    const conteudos = {
+      // ##################### HISTÓRIA #####################
+      'historia-independencia': {
+        titulo: "Independência do Brasil (1822)",
+        texto: `A Independência do Brasil foi um processo complexo e multifacetado, que culminou no "Grito do Ipiranga" em 7 de setembro de 1822. Liderado por Dom Pedro I, então príncipe regente, o movimento foi influenciado por diversos fatores internos e externos. No cenário internacional, as ideias iluministas e as revoluções liberais, como a Revolução Francesa e a Independência dos Estados Unidos, serviam de inspiração para as elites brasileiras. Internamente, a vinda da família real portuguesa para o Brasil em 1808, fugindo das invasões napoleônicas, elevou o status da colônia a Reino Unido, gerando um sentimento de autonomia e progresso.
+
+        Após o retorno de Dom João VI a Portugal em 1821, as Cortes Portuguesas começaram a exigir o retorno de Dom Pedro e a recolonização do Brasil, o que gerou forte resistência. A pressão por uma ruptura crescia, impulsionada por figuras como José Bonifácio de Andrada e Silva, que se tornou um dos principais articuladores do processo de independência. A decisão de Dom Pedro de permanecer no Brasil, conhecida como "Dia do Fico" (9 de janeiro de 1822), foi um marco decisivo.
+
+        A independência, contudo, não representou uma ruptura completa com as estruturas coloniais. A escravidão, por exemplo, foi mantida, e as elites agrárias continuaram a deter o poder político e econômico. O modelo monárquico foi adotado, e o Brasil se tornou um império, mantendo a unidade territorial em grande parte. A luta pela independência não foi homogênea, com focos de resistência em algumas províncias, como Bahia e Pará, onde batalhas foram travadas contra as tropas portuguesas. O reconhecimento internacional da independência foi gradual e, em alguns casos, custoso.`,
+        quiz: [
+          {
+            pergunta: "Em que ano foi proclamada a independência do Brasil?",
+            opcoes: ["1808", "1822", "1889", "1900"],
+            correta: 1
+          },
+          {
+            pergunta: "Quem proclamou a independência do Brasil?",
+            opcoes: ["Dom Pedro II", "Dom João VI", "Dom Pedro I", "José Bonifácio"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual o nome do evento que marcou a decisão de Dom Pedro I de permanecer no Brasil?",
+            opcoes: ["Grito do Ipiranga", "Dia do Fico", "Revolução Pernambucana", "Aclamação de Dom João VI"],
+            correta: 1
+          },
+          {
+            pergunta: "Qual país europeu era a metrópole do Brasil antes da independência?",
+            opcoes: ["Espanha", "Inglaterra", "França", "Portugal"],
+            correta: 3
+          },
+          {
+            pergunta: "Uma das principais figuras de apoio à independência, conhecido como 'Patriarca da Independência', foi:",
+            opcoes: ["Tiradentes", "Prudente de Morais", "José Bonifácio de Andrada e Silva", "Visconde de Cairu"],
+            correta: 2
+          }
+        ]
+      },
+      'historia-constituicao1824': {
+        titulo: "Constituição (1824)",
+        texto: `A Constituição de 1824 foi a primeira carta magna do Brasil, outorgada por Dom Pedro I em 25 de março de 1824, após a dissolução da Assembleia Constituinte. Ela estabeleceu um modelo monárquico e centralizador, com a figura do Imperador como chefe de Estado e de governo, e o Poder Moderador, que concedia a ele amplos poderes, inclusive sobre os demais poderes (Executivo, Legislativo e Judiciário).
+
+        **Principais características:**
+        * **Monarquia Constitucional Hereditária:** O Brasil era uma monarquia com sucessão familiar.
+        * **Quatro Poderes:** Além dos clássicos Executivo, Legislativo e Judiciário, foi instituído o controverso **Poder Moderador**, exclusivo do Imperador, que lhe permitia intervir em decisões dos outros poderes, nomear e demitir ministros, dissolver a Câmara dos Deputados, e suspender magistrados.
+        * **Voto Censitário:** O direito ao voto era restrito a homens livres, com idade mínima de 25 anos (ou 21 para casados/oficiais militares), e que possuíssem uma determinada renda (censo). Isso excluía a maior parte da população, incluindo mulheres, escravos, libertos, praças do exército e a maioria dos trabalhadores.
+        * **Religião Oficial:** O Catolicismo Apostólico Romano foi declarado a religião oficial do Império, embora outras religiões fossem permitidas em culto doméstico. A Igreja era subordinada ao Estado (Padroado e Beneplácito).
+        * **Unitarismo:** A Constituição promovia um Estado centralizado, com pouca autonomia para as províncias, o que gerou descontentamento e revoltas regionais, como a Confederação do Equador.
+        * **Câmara dos Deputados e Senado:** O Legislativo era bicameral; os Deputados eram eleitos por tempo limitado, e os Senadores eram vitalícios e escolhidos pelo Imperador a partir de listas tríplices.
+
+        A outorga da Constituição e a concentração de poderes nas mãos do Imperador geraram insatisfação em setores liberais, que defendiam maior participação política e autonomia provincial, culminando em movimentos como a Confederação do Equador no mesmo ano. Apesar de centralizadora, a Constituição de 1824 foi a carta mais duradoura do Brasil, vigorando por 65 anos, até a Proclamação da República em 1889.`,
+        quiz: [
+          {
+            pergunta: "Qual o ano de outorga da primeira Constituição do Brasil?",
+            opcoes: ["1822", "1824", "1831", "1889"],
+            correta: 1
+          },
+          {
+            pergunta: "Quem outorgou a Constituição de 1824?",
+            opcoes: ["Dom João VI", "José Bonifácio", "Dom Pedro I", "Imperatriz Leopoldina"],
+            correta: 2
+          },
+          {
+            pergunta: "Quantos poderes a Constituição de 1824 estabeleceu?",
+            opcoes: ["Dois", "Três", "Quatro", "Cinco"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual poder era exclusivo do Imperador, permitindo-lhe intervir nos outros poderes?",
+            opcoes: ["Poder Executivo", "Poder Legislativo", "Poder Judiciário", "Poder Moderador"],
+            correta: 3
+          },
+          {
+            pergunta: "O sistema de voto adotado na Constituição de 1824 era o:",
+            opcoes: ["Voto universal", "Voto censitário", "Voto direto", "Voto secreto"],
+            correta: 1
+          }
+        ]
+      },
+      'historia-confederacao': {
+        titulo: "Confederação do Equador (1824)",
+        texto: `A Confederação do Equador foi um movimento republicano e separatista que eclodiu no Nordeste do Brasil em 1824, principalmente em Pernambuco, mas com adesão de outras províncias como Paraíba, Rio Grande do Norte e Ceará. A revolta foi uma reação à centralização do poder imperial imposta pela Constituição de 1824, outorgada por Dom Pedro I, e ao autoritarismo do governo central.
+
+        **Causas e líderes:**
+        * **Descontentamento com a Constituição de 1824:** A outorga da Constituição, que concentrava amplos poderes nas mãos do Imperador (Poder Moderador) e impunha um modelo unitarista, frustrou as elites liberais e regionais que desejavam maior autonomia provincial.
+        * **Autoritarismo do governo imperial:** A dissolução da Assembleia Constituinte por Dom Pedro I em 1823 e a nomeação de presidentes de província que não eram bem-vindos localmente exacerbaram as tensões.
+        * **Crise econômica:** As províncias do Nordeste enfrentavam dificuldades econômicas, o que agravava o clima de insatisfação.
+        * **Ideias liberais e republicanas:** Influenciados por ideais iluministas e movimentos como a independência dos EUA, muitos líderes regionais defendiam a formação de uma república.
+
+        **Principais figuras:**
+        * **Manuel de Carvalho Paes de Andrade:** Líder principal da Confederação em Pernambuco, que proclamou a república.
+        * **Frei Caneca:** Um dos ideólogos do movimento, jornalista e intelectual que defendia ideias liberais e a autonomia provincial.
+
+        **O movimento e sua repressão:**
+        Os confederados propunham a formação de uma república independente, inspirada no modelo norte-americano. A resposta do governo imperial foi enérgica. Dom Pedro I enviou tropas lideradas por Lord Cochrane para reprimir a revolta. Após intensos combates, a Confederação foi sufocada. Muitos líderes, incluindo Frei Caneca, foram presos e executados, o que marcou o rigor da repressão imperial.
+
+        A Confederação do Equador é um dos mais importantes movimentos separatistas do Primeiro Reinado, demonstrando a resistência às políticas centralizadoras do Império e a força dos ideais republicanos e liberais nas províncias.`,
+        quiz: [
+          {
+            pergunta: "Em qual região do Brasil a Confederação do Equador eclodiu em 1824?",
+            opcoes: ["Sudeste", "Sul", "Nordeste", "Norte"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual documento a Confederação do Equador contestava, devido à centralização de poder?",
+            opcoes: ["Lei Áurea", "Constituição de 1824", "Tratado de Tordesilhas", "Ato Adicional"],
+            correta: 1
+          },
+          {
+            pergunta: "Quem foi um dos principais ideólogos da Confederação, jornalista e intelectual?",
+            opcoes: ["Dom Pedro I", "José Bonifácio", "Manuel de Carvalho Paes de Andrade", "Frei Caneca"],
+            correta: 3
+          },
+          {
+            pergunta: "A Confederação do Equador tinha caráter:",
+            opcoes: ["Monarquista e unificador", "Imperialista e escravista", "Republicano e separatista", "Absolutista e católico"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual das províncias abaixo NÃO teve participação significativa na Confederação do Equador?",
+            opcoes: ["Pernambuco", "Rio Grande do Sul", "Paraíba", "Ceará"],
+            correta: 1
+          }
+        ]
+      },
+      'historia-guardaNacional': {
+        titulo: "Guarda Nacional (1831)",
+        texto: `A Guarda Nacional foi uma força paramilitar criada no Brasil durante o Período Regencial, em 1831, logo após a abdicação de Dom Pedro I. Seu objetivo principal era manter a ordem interna, combater levantes e defender a Constituição, atuando como um braço armado do Estado na manutenção da estabilidade política e social.
+
+        **Contexto de criação:**
+        O Brasil vivia um período de grande instabilidade após a saída de Dom Pedro I, com diversas revoltas provinciais e disputas políticas entre liberais e conservadores. O Exército Imperial era visto com desconfiança por alguns setores, especialmente os liberais, por sua ligação com o antigo imperador e por seu caráter profissional e centralizado. A Guarda Nacional surgiu, então, como uma alternativa de "milícia cidadã", que, na prática, servia aos interesses das elites locais.
+
+        **Características:**
+        * **"Cidadãos-soldados":** Teoricamente, era composta por cidadãos maiores de 21 anos (ou 18 se casados), com renda mínima (voto censitário), que deveriam se alistar. Na prática, a força era formada principalmente por proprietários de terras, comerciantes e profissionais liberais, ou seus dependentes e agregados.
+        * **Subordinada ao poder local:** Ao contrário do Exército, a Guarda Nacional era subordinada aos juízes de paz e aos presidentes de província (Ministro da Justiça), o que significava que os oficiais eram, em grande parte, as próprias elites locais (os "coronéis") ou pessoas indicadas por elas. Isso lhes dava grande poder político e militar em suas regiões.
+        * **Manutenção da ordem e dos interesses locais:** Sua principal função era reprimir revoltas (como a Cabanagem e a Balaiada), manter a ordem e defender os interesses dos proprietários de terras e do governo central.
+        * **Hierarquia e Títulos:** Os oficiais eram eleitos ou nomeados com base em sua influência e poder econômico, dando origem à figura do "coronelismo" que marcaria a política brasileira por décadas.
+
+        A Guarda Nacional teve um papel crucial no controle das revoltas regenciais, mas também foi um instrumento de poder e controle das elites locais sobre as populações e a política regional. Ela foi gradualmente perdendo sua função e prestígio com a profissionalização do Exército e o fim do período imperial, sendo extinta formalmente em 1922.`,
+        quiz: [
+          {
+            pergunta: "Em que ano a Guarda Nacional foi criada no Brasil?",
+            opcoes: ["1822", "1831", "1889", "1922"],
+            correta: 1
+          },
+          {
+            pergunta: "Qual o principal objetivo da criação da Guarda Nacional?",
+            opcoes: ["Defender o Brasil em guerras externas", "Proteger as fronteiras", "Manter a ordem interna e combater revoltas", "Substituir totalmente o Exército Imperial"],
+            correta: 2
+          },
+          {
+            pergunta: "Durante qual período da história do Brasil a Guarda Nacional foi criada?",
+            opcoes: ["Primeiro Reinado", "Período Regencial", "Segundo Reinado", "República Velha"],
+            correta: 1
+          },
+          {
+            pergunta: "A quem a Guarda Nacional era subordinada, garantindo poder às elites locais?",
+            opcoes: ["Diretamente ao Imperador", "Ao Parlamento", "Aos juízes de paz e presidentes de província", "A um conselho militar independente"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual fenômeno político-social a existência da Guarda Nacional ajudou a consolidar, especialmente no período imperial?",
+            opcoes: ["Democracia plena", "Feudalismo", "Coronelismo", "Centralismo político"],
+            correta: 2
+          }
+        ]
+      },
+      'historia-atoAdicional': {
+        titulo: "Ato Adicional (1834)",
+        texto: `O Ato Adicional de 1834 foi uma importante reforma constitucional promulgada durante o Período Regencial no Brasil. Seu principal objetivo era descentralizar o poder, concedendo maior autonomia às províncias e buscando apaziguar as tensões políticas e sociais que agitavam o país.
+
+        **Contexto e motivações:**
+        Após a abdicação de Dom Pedro I, o Brasil vivia sob uma Regência, e a instabilidade era grande. As províncias clamavam por mais liberdade e participação política, e havia uma forte corrente liberal que criticava o centralismo da Constituição de 1824 e, em particular, o Poder Moderador. O Ato Adicional foi uma tentativa de responder a essas demandas e evitar a fragmentação do Império.
+
+        **Principais mudanças:**
+        * **Criação das Assembleias Legislativas Provinciais:** Essa foi a mudança mais significativa. As províncias ganharam o direito de legislar sobre assuntos locais (orçamento, impostos, educação, etc.), o que antes era prerrogativa do poder central. Isso deu grande autonomia às elites regionais.
+        * **Extinção do Conselho de Estado:** Este órgão consultivo, que auxiliava o Imperador e era visto como um instrumento de centralização, foi extinto.
+        * **Suspensão temporária do Poder Moderador:** Embora não fosse formalmente extinto, o Poder Moderador, que dava ao Imperador o direito de intervir nos outros poderes, foi suspenso durante a Regência. Isso significava que os regentes não poderiam exercê-lo.
+        * **Criação do Município Neutro (Rio de Janeiro):** A cidade do Rio de Janeiro, capital do Império, foi desmembrada da Província do Rio de Janeiro e elevada à condição de "Município Neutro", sob administração da Corte.
+        * **Eleição de um Regente Único:** O Ato Adicional também previa que, em vez de uma regência trina (composta por três membros), haveria um único regente, eleito por voto indireto. Isso visava dar mais estabilidade à administração.
+
+        **Consequências:**
+        Embora tenha buscado pacificar o país, o Ato Adicional, ao conceder mais autonomia às províncias, acabou por acentuar as disputas regionais e facilitar a eclosão de grandes revoltas regenciais (como a Cabanagem, Farroupilha e Balaiada). O maior poder dos "coronéis" locais, via Assembleias Provinciais e a Guarda Nacional, contribuiu para a descentralização, mas também para o aumento da violência e dos conflitos civis. Sua experiência foi de curta duração, e em 1840, com o Golpe da Maioridade, muitos de seus dispositivos centralizadores foram revertidos.`,
+        quiz: [
+          {
+            pergunta: "Qual o ano de promulgação do Ato Adicional?",
+            opcoes: ["1824", "1831", "1834", "1840"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual o principal objetivo do Ato Adicional de 1834?",
+            opcoes: ["Centralizar o poder na figura do Imperador", "Abolir a escravidão", "Descentralizar o poder e dar autonomia às províncias", "Criar um novo imposto"],
+            correta: 2
+          },
+          {
+            pergunta: "A mudança mais significativa do Ato Adicional foi a criação das:",
+            opcoes: ["Cortes Portuguesas", "Câmaras Municipais", "Assembleias Legislativas Provinciais", "Guarda Nacional"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual poder foi suspenso durante a Regência pelo Ato Adicional?",
+            opcoes: ["Poder Executivo", "Poder Moderador", "Poder Legislativo", "Poder Judiciário"],
+            correta: 1
+          },
+          {
+            pergunta: "O que o Ato Adicional fez com a cidade do Rio de Janeiro, capital do Império?",
+            opcoes: ["Moveu a capital para outra cidade", "Elevou-a à condição de Município Neutro", "Concedeu-lhe autonomia total", "Anexou-a à província de São Paulo"],
+            correta: 1
+          }
+        ]
+      },
+      'historia-cabanagem': {
+        titulo: "Cabanagem (1835-1840)",
+        texto: `A Cabanagem foi uma das mais importantes e violentas revoltas populares do Período Regencial brasileiro, ocorrida na Província do Grão-Pará (que incluía os atuais estados do Pará, Amazonas, Amapá e Roraima) entre 1835 e 1840. Recebeu esse nome porque muitos de seus participantes, os "cabanos", eram pessoas pobres que viviam em cabanas à beira dos rios, como índios, mestiços, negros forros e lavradores.
+
+        **Causas:**
+        * **Pobreza extrema e exploração:** A população do Grão-Pará vivia em condições de miséria, explorada pelas elites locais (latifundiários e comerciantes), em contraste com a riqueza gerada pela exportação de produtos como borracha, cacau e castanha.
+        * **Insatisfação política:** Havia um grande descontentamento com o governo central e com as elites provinciais, que eram vistas como corruptas e insensíveis aos problemas da população. As decisões políticas eram centralizadas no Rio de Janeiro e não beneficiavam a população local.
+        * **Conflitos entre elites:** A abdicação de Dom Pedro I abriu uma lacuna de poder, e as elites locais (liberais e conservadores) disputavam o controle da província, usando a população pobre como massa de manobra.
+        * **Influência de ideias liberais:** Embora fosse um movimento popular, as ideias liberais de autonomia provincial e crítica ao autoritarismo imperial também permeavam o contexto.
+
+        **O movimento:**
+        A revolta começou com a tomada de Belém pelos cabanos. Diferentemente de outras revoltas regenciais, a Cabanagem é notável por ter sido a única em que as camadas populares chegaram a assumir o poder na província. Eles instalaram um governo provisório, mas a inexperiência política dos líderes e as divisões internas levaram a frequentes mudanças no comando e a um período de grande instabilidade.
+
+        **Repressão e consequências:**
+        A repressão do governo regencial foi brutal e sangrenta. Estima-se que mais de 30 mil pessoas, cerca de 20% da população da província na época, morreram em decorrência dos combates, da fome e de doenças. A Cabanagem é um marco da resistência popular contra a opressão e a exclusão social no Brasil, mas também um exemplo da violência com que o Império reagia às insurreições que ameaçavam sua autoridade. A província do Grão-Pará levou décadas para se recuperar dos impactos sociais e econômicos da revolta.`,
+        quiz: [
+          {
+            pergunta: "Em qual província brasileira ocorreu a Cabanagem?",
+            opcoes: ["Pernambuco", "Rio Grande do Sul", "Grão-Pará", "Minas Gerais"],
+            correta: 2
+          },
+          {
+            pergunta: "Por que a revolta recebeu o nome de 'Cabanagem'?",
+            opcoes: ["Líderes moravam em cabanas luxuosas", "Referência à cor da pele dos participantes", "Muitos participantes eram pobres e viviam em cabanas à beira dos rios", "Nome de uma árvore típica da região"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual característica torna a Cabanagem única entre as revoltas regenciais?",
+            opcoes: ["Foi a mais longa", "Teve apoio internacional", "Foi a única em que as camadas populares assumiram o poder na província", "Resultou na independência de uma nova nação"],
+            correta: 2
+          },
+          {
+            pergunta: "Uma das principais causas da Cabanagem foi:",
+            opcoes: ["Aumento da riqueza das camadas populares", "Adoção de novas tecnologias agrícolas", "Pobreza extrema e exploração da população", "Diminuição dos impostos"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual a estimativa do número de mortos na Cabanagem?",
+            opcoes: ["Cerca de 1.000 pessoas", "Cerca de 5.000 pessoas", "Mais de 30.000 pessoas", "Menos de 500 pessoas"],
+            correta: 2
+          }
+        ]
+      },
+      'historia-farroupilha': {
+        titulo: "Revolução Farroupilha (1835-1845)",
+        texto: `A Revolução Farroupilha, ou Guerra dos Farrapos, foi a mais longa e uma das mais importantes revoltas regenciais do Brasil, ocorrida no Rio Grande do Sul e em Santa Catarina, entre 1835 e 1845. Liderada por estancieiros gaúchos, o movimento tinha caráter republicano e federalista, buscando maior autonomia para a província e condições econômicas mais favoráveis para seus produtos.
+
+        **Causas:**
+        * **Altos impostos sobre o charque:** O charque (carne-seca), principal produto da economia gaúcha, era fortemente taxado pelo governo imperial, enquanto produtos similares vindos da Argentina e do Uruguai entravam no Brasil com impostos mais baixos, prejudicando os produtores locais.
+        * **Centralismo político:** As elites gaúchas, influenciadas por ideais liberais e republicanos, contestavam a centralização do poder no Rio de Janeiro e a pouca autonomia concedida às províncias.
+        * **Desejo de autonomia:** Havia um forte sentimento regionalista e o desejo de ter maior controle sobre os assuntos locais.
+        * **Questão da escravidão:** Embora não fosse a causa principal, a questão da escravidão também estava presente, com a promessa de liberdade para escravos que lutassem ao lado dos farrapos.
+
+        **O movimento e seus líderes:**
+        Os farrapos proclamaram a República Rio-Grandense (República de Piratini) em 1836 e, posteriormente, a República Catarinense (República Juliana) em 1839, com a ajuda de Giuseppe Garibaldi. Os principais líderes foram **Bento Gonçalves**, **Giuseppe Garibaldi** (que participou também da unificação italiana) e **Davi Canabarro**.
+
+        **Repressão e fim da guerra:**
+        O Império enviou tropas para combater os farrapos, e a guerra se arrastou por dez anos, com muitos combates e perdas. Para colocar fim ao conflito, o governo imperial, sob a liderança do então Barão de Caxias (Luís Alves de Lima e Silva), adotou uma estratégia de pacificação que combinava força militar e negociação. A guerra terminou com a **Paz de Ponche Verde** em 1845, que concedeu anistia aos rebeldes, garantiu a não-recolocação dos escravos que lutaram pela república na escravidão, e fixou tarifas alfandegárias mais favoráveis ao charque gaúcho. A República Rio-Grandense foi reincorporada ao Império.
+
+        A Revolução Farroupilha é um evento marcante da história do Brasil, simbolizando a resistência regional ao centralismo imperial e a busca por maior liberdade e autonomia, com a particularidade de ter sido encerrada por um acordo de paz negociado.`,
+        quiz: [
+          {
+            pergunta: "Qual província foi o principal palco da Revolução Farroupilha?",
+            opcoes: ["Pernambuco", "Maranhão", "Rio Grande do Sul", "Pará"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual era o principal produto econômico do Rio Grande do Sul que sofria com impostos altos?",
+            opcoes: ["Café", "Açúcar", "Charque", "Algodão"],
+            correta: 2
+          },
+          {
+            pergunta: "Quem foi um dos principais líderes da Revolução Farroupilha e proclamou a República Rio-Grandense?",
+            opcoes: ["Manuel de Carvalho", "Frei Caneca", "Bento Gonçalves", "Giuseppe Garibaldi"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual das seguintes características define a Revolução Farroupilha?",
+            opcoes: ["Monarquista e centralizadora", "Abolicionista e pacifista", "Republicana e federalista", "Imperialista e expansionista"],
+            correta: 2
+          },
+          {
+            pergunta: "Como terminou a Revolução Farroupilha?",
+            opcoes: ["Com a independência total do Rio Grande do Sul", "Com a vitória esmagadora do Império sem negociação", "Com a Paz de Ponche Verde, um acordo negociado", "Com a Proclamação da República no Brasil"],
+            correta: 2
+          }
+        ]
+      },
+      'historia-balaiada': {
+        titulo: "Balaiada (1838-1841)",
+        texto: `A Balaiada foi uma revolta popular que ocorreu na Província do Maranhão entre 1838 e 1841, durante o Período Regencial. O nome "Balaiada" deriva de Manuel Francisco dos Anjos Ferreira, um dos líderes, que produzia balaios (cestos). A revolta foi um levante de camadas populares, como vaqueiros, artesãos, escravos e camponeses, contra a elite local e o governo imperial.
+
+        **Causas:**
+        * **Pobreza e desigualdade social:** A população do Maranhão, especialmente a rural, vivia em condições de miséria e exploração, com grande concentração de terras e poder nas mãos de poucos latifundiários.
+        * **Disputas políticas locais:** Havia um conflito entre duas facções da elite maranhense: os "Bem-te-vis" (liberais) e os "Cabanos" (conservadores, que também se chamavam "Farroupilhas" localmente, sem ligação com a revolta do Sul). As disputas pelo controle político local intensificaram as tensões sociais.
+        * **Recrutamento forçado:** O recrutamento obrigatório para o Exército Imperial e a Guarda Nacional era imposto à população pobre, gerando grande insatisfação.
+        * **Autoritarismo e injustiças:** A população sofria com a arbitrariedade das autoridades, os altos impostos e a falta de oportunidades.
+
+        **O movimento e seus líderes:**
+        A revolta começou em 1838 e rapidamente ganhou adesão de milhares de pessoas. Dentre os líderes populares, destacam-se:
+        * **Manuel Francisco dos Anjos Ferreira (o Balaio):** Artesão que liderava os balaios.
+        * **Raimundo Gomes (o Cara Preta):** Vaqueiro que liderava os "cabanos" maranhenses.
+        * **Cosme Bento:** Um ex-escravo que liderou cerca de 3 mil escravos fugidos (quilombolas) na revolta.
+
+        Os balaios chegaram a tomar a cidade de Caxias, a segunda mais importante do Maranhão. O movimento, porém, carecia de uma direção política clara e coesa, o que dificultava sua organização.
+
+        **Repressão e consequências:**
+        O governo regencial enviou Luís Alves de Lima e Silva (futuro Duque de Caxias) para reprimir a revolta. Caxias combinou força militar com anistia para aqueles que se entregassem, conseguindo desorganizar o movimento. A Balaiada foi violentamente reprimida, com milhares de mortos, prisões e execuções. A participação de escravos alarmou as elites, que viram a revolta como uma ameaça à ordem social e à propriedade.
+
+        A Balaiada é um exemplo da capacidade de mobilização das camadas populares em face da injustiça e da opressão, e de como as disputas entre elites podiam abrir espaço para a eclosão de movimentos sociais mais amplos.`,
+        quiz: [
+          {
+            pergunta: "Em qual província brasileira ocorreu a Balaiada?",
+            opcoes: ["Pernambuco", "Maranhão", "Rio Grande do Sul", "Grão-Pará"],
+            correta: 1
+          },
+          {
+            pergunta: "De onde deriva o nome 'Balaiada'?",
+            opcoes: ["De um tipo de bala utilizada na guerra", "De um líder que fabricava balaios (cestos)", "De um rio da região", "De uma tribo indígena local"],
+            correta: 1
+          },
+          {
+            pergunta: "Qual ex-escravo liderou cerca de 3 mil escravos fugidos na Balaiada?",
+            opcoes: ["Zumbi dos Palmares", "Chico Rei", "Cosme Bento", "Dragão do Mar"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual das causas abaixo NÃO foi um fator para a Balaiada?",
+            opcoes: ["Pobreza e desigualdade social", "Disputas políticas locais entre elites", "Recrutamento forçado", "Apoio total do governo imperial à população pobre"],
+            correta: 3
+          },
+          {
+            pergunta: "Quem foi enviado pelo governo regencial para reprimir a Balaiada, tornando-se mais tarde Duque de Caxias?",
+            opcoes: ["Dom Pedro II", "Bento Gonçalves", "Manuel de Carvalho", "Luís Alves de Lima e Silva"],
+            correta: 3
+          }
+        ]
+      },
+      // ##################### FILOSOFIA #####################
+      'filosofia-preSocraticos': {
+        titulo: "Filosofia Pré-Socrática",
+        texto: `A Filosofia Pré-Socrática representa o período inicial da filosofia ocidental, que se estende aproximadamente do século VII ao V a.C., antecedendo Sócrates. Esses pensadores, em sua maioria provenientes das colônias gregas da Jônia (Ásia Menor) e da Magna Grécia (sul da Itália), buscavam romper com as explicações mitológicas e religiosas para o mundo, propondo uma compreensão baseada na razão e na observação da natureza. O foco principal era a **physis** (natureza) e a busca pelo **arché** (princípio primordial) que deu origem a todas as coisas.
+
+        **Tales de Mileto** (considerado o primeiro filósofo) propôs que a **água** seria o arché, pois a observava em diversas formas e como elemento essencial para a vida. Ele também é conhecido por suas contribuições para a matemática e astronomia.
+
+        **Anaximandro**, discípulo de Tales, criticou a ideia de um elemento específico como arché, propondo o **ápeiron** (o ilimitado, o indefinido) como princípio de tudo, algo que não pode ser percebido pelos sentidos.
+
+        **Anaxímenes**, por sua vez, sugeriu o **ar** como arché, explicando as transformações da matéria por meio de processos de rarefação e condensação do ar.
+
+        **Heráclito de Éfeso** é famoso por sua doutrina do **devir** ou da **mudança constante**. Para ele, "tudo flui, nada permanece". A única constante é a própria mudança, e o **fogo** seria o elemento primordial que simboliza essa eterna transformação. Ele também enfatizou a importância do **logos** (razão universal) que governa o universo.
+
+        **Parmênides de Eleia** defendeu a ideia do **Ser** como imutável, eterno e uno. Para ele, o movimento e a mudança que percebemos pelos sentidos são ilusões. A **razão** é o único caminho para se chegar à verdade, e o "Não-Ser" não pode ser pensado nem existido. Sua filosofia é oposta à de Heráclito.
+
+        Os **pluralistas**, como **Empédocles** (quatro elementos: terra, água, fogo, ar) e **Anaxágoras** (noûs - mente organizadora e sementes), tentaram conciliar a ideia de mudança com a de permanência, propondo múltiplos princípios.
+
+        Os **atomistas**, **Leucipo** e **Demócrito**, propuseram que a realidade é composta por **átomos** (partículas indivisíveis e eternas) que se movem no vazio. Essa teoria foi um passo fundamental para o desenvolvimento do pensamento científico.
+
+        Esses filósofos, ao buscar explicações racionais para o universo, lançaram as bases para o desenvolvimento posterior da ciência e da filosofia, abrindo caminho para a investigação crítica e a busca pelo conhecimento.`,
+        quiz: [
+          {
+            pergunta: "Qual o principal foco da Filosofia Pré-Socrática?",
+            opcoes: ["A ética e a moral", "A política e o Estado", "A natureza (physis) e o princípio primordial (arché)", "A existência de Deus"],
+            correta: 2
+          },
+          {
+            pergunta: "Quem é considerado o primeiro filósofo e propôs a água como arché?",
+            opcoes: ["Heráclito", "Tales de Mileto", "Parmênides", "Anaximandro"],
+            correta: 1
+          },
+          {
+            pergunta: "Qual filósofo pré-socrático defendia que tudo está em constante mudança (devir) e o fogo é o elemento primordial?",
+            opcoes: ["Parmênides", "Tales", "Heráclito", "Demócrito"],
+            correta: 2
+          },
+          {
+            pergunta: "Para qual filósofo o Ser é imutável, eterno e uno, e o movimento é uma ilusão?",
+            opcoes: ["Heráclito", "Anaximandro", "Anaxímenes", "Parmênides"],
+            correta: 3
+          },
+          {
+            pergunta: "Anaximandro propôs o ápeiron como arché. O que significa ápeiron?",
+            opcoes: ["A água", "O ar", "O fogo", "O ilimitado, o indefinido"],
+            correta: 3
+          }
+        ]
+      },
+      'filosofia-heraclito': {
+        titulo: "Heráclito e o Devir (C. 544-484 a.C.)",
+        texto: `Heráclito de Éfeso foi um filósofo pré-socrático que viveu na Jônia, conhecido por sua doutrina do **devir** ou da **mudança constante**. Sua filosofia se contrapõe à de Parmênides ao afirmar que a realidade não é estática, mas está em perpétua transformação. A frase mais famosa atribuída a ele é "tudo flui, nada permanece", ou "não se pode entrar duas vezes no mesmo rio", que ilustra a ideia de que a cada instante tanto o rio quanto a pessoa que nele entra já são diferentes.
+
+        Para Heráclito, a única constante no universo é a própria mudança. Ele via o **fogo** como o elemento primordial (arché) que simboliza essa eterna transformação, pois o fogo está sempre em movimento, consumindo e gerando novas formas. No entanto, o fogo heraclitiano não é um caos aleatório, mas sim um processo ordenado.
+
+        Heráclito também enfatizou a importância do **logos** (razão universal, lei cósmica, discurso ou medida). O logos é o princípio que governa o universo, a harmonia oculta que organiza o fluxo de todas as coisas. Mesmo na aparente desordem da mudança, há uma racionalidade subjacente que mantém o equilíbrio através da tensão dos opostos (dia e noite, guerra e paz, vida e morte). Ele acreditava que a maioria das pessoas não percebia essa ordem, vivendo como se estivessem em um mundo particular de sonhos, enquanto os filósofos deveriam despertar para o logos universal.
+
+        Sua filosofia influenciou profundamente o pensamento posterior, especialmente a dialética e a ideia de que o conflito de opostos é fundamental para o movimento e a existência.`,
+        quiz: [
+          {
+            pergunta: "Qual o principal conceito associado à filosofia de Heráclito?",
+            opcoes: ["O Ser imutável", "A Teoria das Ideias", "O Devir (mudança constante)", "A busca pelo prazer"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual elemento Heráclito considerava o símbolo da eterna transformação?",
+            opcoes: ["Água", "Terra", "Ar", "Fogo"],
+            correta: 3
+          },
+          {
+            pergunta: "A frase 'não se pode entrar duas vezes no mesmo rio' é atribuída a qual filósofo?",
+            opcoes: ["Tales de Mileto", "Parmênides", "Heráclito", "Anaximandro"],
+            correta: 2
+          },
+          {
+            pergunta: "O que Heráclito entendia por 'logos'?",
+            opcoes: ["O caos primordial", "Uma divindade específica", "A razão universal que governa o universo", "O silêncio"],
+            correta: 2
+          },
+          {
+            pergunta: "A filosofia de Heráclito se contrapõe diretamente à de qual outro filósofo pré-socrático?",
+            opcoes: ["Tales", "Anaxímenes", "Demócrito", "Parmênides"],
+            correta: 3
+          }
+        ]
+      },
+      'filosofia-parmenides': {
+        titulo: "Parmênides: O Ser Imóvel (C. 544-450 a.C.)",
+        texto: `Parmênides de Eleia, um dos mais importantes filósofos pré-socráticos, é o principal expoente da Escola Eleática. Sua filosofia se concentra na natureza do **Ser** e defende a ideia de que o Ser é **imutável, eterno, uno, indivisível e imóvel**. Para Parmênides, o movimento, a mudança, o nascimento e a morte que percebemos pelos nossos sentidos são meras **ilusões**.
+
+        Ele distinguiu duas vias para o conhecimento:
+        1.  **A Via da Verdade (ou do Ser):** Atingida apenas pela **razão** e pelo pensamento lógico. Nela, o que É, É, e o que Não-É, Não-É. O Ser é completo e não pode se tornar algo diferente, pois isso implicaria que ele se tornaria Não-Ser. O Não-Ser não pode ser pensado nem existir. Portanto, a mudança é impossível.
+        2.  **A Via da Opinião (ou da Aparência):** Baseada nos **sentidos** e na percepção. É o caminho das ilusões, onde a multiplicidade e a mudança são aparentes, mas não reais.
+
+        A famosa frase de Parmênides, "o Ser é e o Não-Ser não é", resume sua metafísica. O que existe (o Ser) é pleno e contínuo, não possui vazios, e é o único objeto de conhecimento verdadeiro. O vazio (o Não-Ser) não existe e não pode ser concebido.
+
+        Sua filosofia teve um impacto gigantesco, desafiando a própria ideia de mudança e movimento, e influenciando Platão (com a distinção entre mundo sensível e inteligível) e outros pensadores posteriores. Ele é frequentemente contrastado com Heráclito, que defendia a mudança constante, tornando-os dois pilares opostos no debate sobre a natureza da realidade na filosofia antiga.`,
+        quiz: [
+          {
+            pergunta: "Qual a principal característica do 'Ser' para Parmênides?",
+            opcoes: ["Está em constante mudança", "É múltiplo e divisível", "É imutável, eterno e uno", "É uma ilusão dos sentidos"],
+            correta: 2
+          },
+          {
+            pergunta: "Para Parmênides, qual é o único caminho para se chegar à verdade?",
+            opcoes: ["Os sentidos", "A fé", "A intuição", "A razão"],
+            correta: 3
+          },
+          {
+            pergunta: "A frase 'o Ser é e o Não-Ser não é' é central na filosofia de qual pensador?",
+            opcoes: ["Heráclito", "Tales", "Parmênides", "Demócrito"],
+            correta: 2
+          },
+          {
+            pergunta: "O movimento e a mudança são considerados por Parmênides como:",
+            opcoes: ["A essência da realidade", "Uma manifestação do Ser", "Ilusões dos sentidos", "Resultados do logos"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual escola filosófica Parmênides é considerado um dos principais expoentes?",
+            opcoes: ["Escola de Mileto", "Escola Eleática", "Escola Atomista", "Sofistas"],
+            correta: 1
+          }
+        ]
+      },
+      'filosofia-sofistas': {
+        titulo: "Sofistas e a Arte de Argumentar (séc. V e IV a.C.)",
+        texto: `Os Sofistas foram um grupo de professores itinerantes que surgiram na Grécia Antiga, especialmente em Atenas, nos séculos V e IV a.C. Em um período de ascensão da democracia, onde a persuasão na assembleia e nos tribunais era crucial, os Sofistas se especializaram em ensinar a arte da **retórica** (a arte de falar bem e persuadir) e da **oratória**, cobrando por suas aulas.
+
+        Diferentemente dos filósofos anteriores (pré-socráticos) que buscavam o "arché" da natureza, e dos que viriam depois (Sócrates, Platão, Aristóteles) que buscavam a verdade universal, os Sofistas tinham um foco mais prático e relativista:
+        * **Relativismo:** Acreditavam que a verdade não é absoluta, mas relativa ao indivíduo (Protágoras: "O homem é a medida de todas as coisas").
+        * **Convencionalismo:** Leis e valores morais seriam convenções humanas, e não verdades universais.
+        * **Domínio da Retórica:** Ensinavam técnicas de argumentação e persuasão, muitas vezes focando em como vencer um debate, independentemente da verdade. Isso lhes valeu críticas de filósofos como Platão e Sócrates, que os acusavam de serem enganadores e de venderem "falsa sabedade".
+        * **Educação:** Contribuíram para a disseminação do conhecimento e da educação em diversas áreas, como gramática, música e política.
+
+        Principais sofistas:
+        * **Protágoras:** Famoso pela frase "O homem é a medida de todas as coisas", que expressa seu relativismo.
+        * **Górgias:** Destacou-se por sua habilidade retórica e ceticismo radical, argumentando que nada existe, e se existisse, não poderia ser conhecido, e se pudesse ser conhecido, não poderia ser comunicado.
+        * **Hípias:** Conhecido por sua erudição em diversas áreas do conhecimento.
+
+        Embora muitas vezes criticados pela sua abordagem de que a "verdade" poderia ser manipulada pela linguagem, os Sofistas foram figuras importantes para o desenvolvimento do pensamento crítico, da retórica e da própria democracia ateniense, ao popularizar o ensino e o debate de ideias.`,
+        quiz: [
+          {
+            pergunta: "Os Sofistas eram principalmente conhecidos por ensinar qual arte?",
+            opcoes: ["Escultura", "Música", "Retórica e Oratória", "Astronomia"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual era a visão dos Sofistas sobre a verdade?",
+            opcoes: ["Era absoluta e universal", "Era revelada pelos deuses", "Era relativa ao indivíduo", "Não existia"],
+            correta: 2
+          },
+          {
+            pergunta: "A frase 'O homem é a medida de todas as coisas' é atribuída a qual Sofista?",
+            opcoes: ["Górgias", "Hípias", "Protágoras", "Sócrates"],
+            correta: 2
+          },
+          {
+            pergunta: "Por que os Sofistas eram criticados por filósofos como Platão e Sócrates?",
+            opcoes: ["Por buscarem a verdade universal", "Por não cobrarem por suas aulas", "Por focarem em persuadir e vencer debates, independentemente da verdade", "Por defenderem a democracia"],
+            correta: 2
+          },
+          {
+            pergunta: "Em que período da Grécia Antiga os Sofistas surgiram?",
+            opcoes: ["Período Arcaico", "Período Clássico (séc. V e IV a.C.)", "Período Helenístico", "Idade Média"],
+            correta: 1
+          }
+        ]
+      },
+      'filosofia-pitagoras': {
+        titulo: "Pitágoras (C. 570-495 a.C.)",
+        texto: `Pitágoras de Samos foi um filósofo e matemático grego que viveu por volta dos séculos VI e V a.C. Ele é mais conhecido por suas contribuições à matemática, especialmente o **Teorema de Pitágoras**, mas sua influência se estende também à filosofia, à música e a um estilo de vida que fundou. Pitágoras acreditava que os **números** eram a chave para entender o universo e que o cosmos era governado por princípios matemáticos.
+
+        **Principais ideias e contribuições:**
+        * **O número como princípio:** Para Pitágoras, o número não era apenas uma ferramenta de contagem, mas o princípio fundamental (arché) de todas as coisas. Acreditava que a realidade podia ser expressa por relações numéricas e harmonias matemáticas.
+        * **Harmonia das esferas:** Propôs a ideia de que os planetas e corpos celestes se moviam em órbitas que produziam sons musicais, gerando uma "harmonia das esferas" inaudível para os humanos.
+        * **Filosofia e modo de vida:** Fundou uma escola ou irmandade em Crotona, na Magna Grécia (sul da Itália), que era ao mesmo tempo uma comunidade religiosa, científica e filosófica. Os pitagóricos levavam um estilo de vida ascético, com regras rígidas, incluindo vegetarianismo, meditação e busca pela purificação da alma.
+        * **Transmigração da alma (metempsicose):** Acreditava na imortalidade e na transmigração da alma (reencarnação) para outros corpos, sejam eles humanos, animais ou plantas, como um ciclo de purificação.
+        * **Contribuições à matemática:** O teorema que leva seu nome (a² + b² = c²) para triângulos retângulos é um de seus legados mais duradouros, embora a autoria exata dentro da escola pitagórica seja debatida. Também estudou proporções e progressões.
+
+        Pitágoras e sua escola tiveram um impacto profundo no desenvolvimento do pensamento ocidental, especialmente na matemática e na concepção de que o universo possui uma estrutura racional e numérica. Sua fusão de matemática, misticismo e filosofia influenciou Platão e muitos outros pensadores.`,
+        quiz: [
+          {
+            pergunta: "Qual o famoso teorema matemático associado a Pitágoras?",
+            opcoes: ["Teorema de Tales", "Teorema de Pitágoras", "Teorema de Fermat", "Teorema de Gödel"],
+            correta: 1
+          },
+          {
+            pergunta: "Para Pitágoras, qual era a chave para entender o universo e o princípio fundamental de todas as coisas (arché)?",
+            opcoes: ["Água", "Fogo", "O Nada", "Os números"],
+            correta: 3
+          },
+          {
+            pergunta: "Qual a ideia de Pitágoras sobre os movimentos dos corpos celestes?",
+            opcoes: ["Eles eram aleatórios", "Eles produziam uma 'harmonia das esferas'", "Eles não existiam", "Eles eram movidos por divindades caóticas"],
+            correta: 1
+          },
+          {
+            pergunta: "A crença na transmigração da alma (reencarnação) era defendida por qual filósofo?",
+            opcoes: ["Sócrates", "Heráclito", "Pitágoras", "Parmênides"],
+            correta: 2
+          },
+          {
+            pergunta: "Onde Pitágoras fundou sua escola/irmandade?",
+            opcoes: ["Atenas", "Mileto", "Crotona (Magna Grécia)", "Éfeso"],
+            correta: 2
+          }
+        ]
+      },
+      'filosofia-gorgias': {
+        titulo: "Górgias (Séc. V a.C.)",
+        texto: `Górgias de Leontini (Sicília) foi um dos mais proeminentes Sofistas do século V a.C., conhecido por sua extraordinária habilidade na **retórica** e por seu **ceticismo radical**. Ao contrário de outros pensadores que buscavam uma verdade universal, Górgias questionava a própria possibilidade de se conhecer e comunicar essa verdade, levando o relativismo sofístico a um extremo.
+
+        Sua obra mais famosa, "Sobre o Não-Ser ou Sobre a Natureza", apresenta três teses principais, que são um desafio direto à filosofia de Parmênides:
+        1.  **Nada existe:** Górgias argumentava que, se algo existisse, deveria ser eterno ou criado, uno ou múltiplo, imóvel ou em movimento. Cada uma dessas possibilidades levava a contradições lógicas, portanto, nada poderia existir.
+        2.  **Se algo existisse, não poderia ser conhecido:** Mesmo que algo existisse, nossos pensamentos e percepções não poderiam capturar sua essência. O conhecimento seria impossível porque o pensamento não é idêntico à realidade.
+        3.  **Se algo pudesse ser conhecido, não poderia ser comunicado:** A linguagem é incapaz de expressar plenamente a realidade. As palavras são apenas símbolos que não capturam a essência das coisas, e cada indivíduo as interpreta de forma diferente, tornando a comunicação da verdade impossível.
+
+        Para Górgias, o que importava não era a busca pela verdade (já que ela era inatingível ou incomunicável), mas a **persuasão** através da oratória. Ele ensinava seus alunos a construir argumentos convincentes, mesmo que fossem sobre questões sem uma base factual sólida. Sua influência na oratória e na sofística foi imensa, e ele é frequentemente lembrado como um mestre da palavra e um provocador do pensamento filosófico de sua época. Suas teses, embora radicais, forçaram outros filósofos a repensar os fundamentos do conhecimento, da linguagem e da realidade.`,
+        quiz: [
+          {
+            pergunta: "Qual a principal área de especialização de Górgias?",
+            opcoes: ["Matemática", "Retórica", "Astronomia", "Medicina"],
+            correta: 1
+          },
+          {
+            pergunta: "Quantas teses principais Górgias apresentou em sua obra 'Sobre o Não-Ser'?",
+            opcoes: ["Uma", "Duas", "Três", "Quatro"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual das seguintes afirmações resume uma das teses de Górgias?",
+            opcoes: ["A verdade é absoluta e acessível a todos.", "O Ser é imutável e eterno.", "Se algo existisse, não poderia ser comunicado.", "Tudo flui, nada permanece."],
+            correta: 2
+          },
+          {
+            pergunta: "Górgias é considerado um representante de qual corrente filosófica?",
+            opcoes: ["Pré-Socráticos", "Escola Eleática", "Sofistas", "Atomistas"],
+            correta: 2
+          },
+          {
+            pergunta: "Para Górgias, qual era o mais importante, dada a impossibilidade de conhecer a verdade?",
+            opcoes: ["A busca pela verdade", "A persuasão através da oratória", "Ameditar em silêncio", "A prática da justiça universal"],
+            correta: 1
+          }
+        ]
+      },
+      'filosofia-metodoSocratico': {
+        titulo: "Método Socrático",
+        texto: `O Método Socrático, também conhecido como **Maiêutica** (que significa "parto de ideias"), é uma abordagem filosófica desenvolvida por Sócrates para buscar a verdade e o conhecimento. Diferente dos sofistas que ensinavam a retórica para persuadir, Sócrates não se considerava um professor, mas um "parteiro" que ajudava as pessoas a "dar à luz" suas próprias ideias e verdades.
+
+        O método consiste em duas etapas principais:
+        1.  **Ironia:** Sócrates iniciava o diálogo com uma postura de humildade, afirmando sua própria ignorância ("Só sei que nada sei"). Ele fazia perguntas ingênuas, convidando o interlocutor a expor suas opiniões e definições sobre determinado assunto (justiça, beleza, coragem, etc.). Através de questionamentos sucessivos, Sócrates levava o interlocutor a perceber as contradições e inconsistências em suas próprias crenças, demonstrando que o que ele pensava saber, na verdade, não sabia. Essa fase, que pode ser desconfortável, era a **destruição de falsos saberes**.
+        2.  **Maiêutica:** Uma vez que o interlocutor reconhecia sua ignorância (o "não saber" socrático), Sócrates passava à fase construtiva. Com novas perguntas, ele o guiava para que, por si mesmo, chegasse a novas definições e conceitos mais próximos da verdade. O objetivo não era dar respostas prontas, mas estimular o pensamento crítico, a reflexão e o autoconhecimento. A verdade não era imposta, mas descoberta pelo próprio indivíduo através do diálogo.
+
+        **Características do método:**
+        * **Dialógico:** Baseado na conversação e na troca de perguntas e respostas.
+        * **Questionador:** Foco na problematização e na desconstrução de certezas.
+        * **Indutivo:** Parte de exemplos particulares para chegar a conceitos universais.
+        * **Autoconhecimento:** O objetivo final era que o indivíduo conhecesse a si mesmo e aprimorasse sua alma.
+
+        O Método Socrático revolucionou a filosofia, deslocando o foco da natureza (physis) para o ser humano e suas questões éticas e morais. É a base da investigação filosófica e um modelo de ensino que estimula o pensamento crítico e a autonomia intelectual.`,
+        quiz: [
+          {
+            pergunta: "Qual o outro nome do Método Socrático?",
+            opcoes: ["Silogismo", "Dialética", "Maiêutica", "Metafísica"],
+            correta: 2
+          },
+          {
+            pergunta: "A primeira etapa do Método Socrático, que busca desconstruir falsos saberes, é chamada de:",
+            opcoes: ["Maiêutica", "Ironia", "Dialética", "Retórica"],
+            correta: 1
+          },
+          {
+            pergunta: "A frase 'Só sei que nada sei' é atribuída a qual filósofo e reflete qual etapa de seu método?",
+            opcoes: ["Platão, Maiêutica", "Aristóteles, Indução", "Sócrates, Ironia", "Heráclito, Devir"],
+            correta: 2
+          },
+          {
+            pergunta: "O objetivo final da Maiêutica Socrática é:",
+            opcoes: ["Impor uma verdade ao interlocutor", "Ajuda o interlocutor a dar à luz suas próprias ideias e verdades", "Vencer um debate a todo custo", "Provar a ignorância dos outros"],
+            correta: 1
+          },
+          {
+            pergunta: "Qual das seguintes características NÃO se aplica ao Método Socrático?",
+            opcoes: ["É dialógico", "É questionador", "Baseia-se em respostas prontas do mestre", "Busca o autoconhecimento"],
+            correta: 2
+          }
+        ]
+      },
+      'filosofia-socrates': {
+        titulo: "Sócrates (C. 470-399 a.C.)",
+        texto: `Sócrates é uma das figuras mais emblemáticas e influentes da filosofia ocidental, considerado um marco divisório na história do pensamento grego. Embora não tenha deixado obras escritas (todo o seu conhecimento nos chegou através de seus discípulos, principalmente Platão e Xenofonte), sua forma de filosofar e suas ideias revolucionaram a filosofia. Sócrates viveu em Atenas e dedicou sua vida a questionar os cidadãos sobre suas crenças, valores e o sentido da vida.
+
+        **Principais características e ideias:**
+        * **O 'Só sei que nada sei':** Essa frase famosa expressa sua humildade intelectual e o ponto de partida de sua busca por conhecimento. Reconhecer a própria ignorância é o primeiro passo para o verdadeiro saber.
+        * **Foco no ser humano:** Ao contrário dos pré-socráticos, que se preocupavam com a natureza (physis), Sócrates deslocou o foco da filosofia para o **ser humano**, suas questões éticas, morais, políticas e a busca pelo autoconhecimento ("Conhece-te a ti mesmo").
+        * **A virtude é conhecimento:** Para Sócrates, a virtude (areté) não era um dom ou uma característica inata, mas algo que podia ser aprendido. Ele acreditava que ninguém faz o mal voluntariamente; o mal resulta da ignorância. Se o homem conhecesse o bem, agiria virtuosamente.
+        * **A busca pelo conceito:** Através de seu **Método Socrático** (Ironia e Maiêutica), Sócrates buscava chegar à essência universal dos conceitos morais (justiça, coragem, beleza, virtude), queele acreditava serem fixos e objetivos, não relativos como defendiam os sofistas.
+        * **Cidadão e a Pólis:** Sócrates era um cidadão ateniense dedicado, participando da vida pública através de seus diálogos na ágora. Ele acreditava na importância de uma vida virtuosa para o bem da pólis (cidade-estado).
+
+        **O Julgamento e a Morte:**
+        Em 399 a.C., Sócrates foi acusado de corromper a juventude e de não crer nos deuses da cidade (impiedade). Apesar de ter a chance de fugir, ele aceitou a condenação à morte por cicuta, defendendo a importância de obedecer às leis da cidade, mesmo que injustas em seu caso, para não desrespeitar o sistema legal que ele tanto valorizava. Sua morte se tornou um símbolo da integridade filosófica e da busca inabalável pela verdade.`,
+        quiz: [
+          {
+            pergunta: "Qual filósofo não deixou obras escritas, e seu pensamento é conhecido por seus discípulos?",
+            opcoes: ["Platão", "Aristóteles", "Sócrates", "Tales de Mileto"],
+            correta: 2
+          },
+          {
+            pergunta: "A frase 'Só sei que nada sei' é atribuída a qual filósofo?",
+            opcoes: ["Parmênides", "Heráclito", "Sócrates", "Protágoras"],
+            correta: 2
+          },
+          {
+            pergunta: "Sócrates deslocou o foco da filosofia dos pré-socráticos (natureza) para qual área?",
+            opcoes: ["O cosmos e o universo", "As questões éticas e morais do ser humano", "A matemática pura", "Os mitos e as religiões"],
+            correta: 1
+          },
+          {
+            pergunta: "Para Sócrates, a virtude é:",
+            opcoes: ["Um dom divino inato", "Um resultado da ignorância", "Conhecimento que pode ser aprendido", "A busca pelo prazer"],
+            correta: 2
+          },
+          {
+            pergunta: "Sócrates foi condenado à morte sob quais acusações principais?",
+            opcoes: ["Traição e rebelião", "Roubo e fraude", "Corromper a juventude e impiedade", "Fraude eleitoral e tirania"],
+            correta: 2
+          }
+        ]
+      },
+      'filosofia-buscaConceito': {
+        titulo: "Busca pelo Conceito (Sócrates)",
+        texto: `A "Busca pelo Conceito" é um elemento central do pensamento de Sócrates e está intrinsecamente ligada ao seu Método Socrático (Maiêutica). Sócrates acreditava que, para viver uma vida boa e virtuosa, era fundamental ter um conhecimento claro e universal dos conceitos morais e éticos.
+
+        Diferentemente dos Sofistas, que defendiam o relativismo (a verdade é relativa a cada um), Sócrates estava convencido de que existiam **conceitos universais e objetivos** para noções como justiça, coragem, beleza, piedade, amizade e, fundamentalmente, a **virtude** (areté).
+
+        **Como a busca ocorria:**
+        Sócrates não definia esses conceitos de antemão. Pelo contrário, ele começava um diálogo com um interlocutor que se considerava conhecedor de um determinado conceito (por exemplo, "o que é a justiça?"). Através de uma série de perguntas incisivas (a **ironia** socrática), ele levava o interlocutor a perceber que suas definições iniciais eram superficiais, contraditórias ou baseadas em exemplos particulares, e não na essência universal do conceito.
+
+        Uma vez que a ignorância era reconhecida (o "não-saber"), a fase da **maiêutica** entrava em ação. Com novas perguntas e refinamentos, Sócrates guiava o interlocutor para que, por si mesmo, tentasse formular uma definição mais precisa, universal e coerente. O objetivo não era alcançar uma definição final e inquestionável, mas sim o processo de investigação racional e a purificação das ideias.
+
+        **Importância da busca pelo conceito:**
+        * **Fundamento da ética:** Para Sócrates, se a virtude é conhecimento, então é preciso conhecer o que são as virtudes para poder praticá-las. A definição clara dos conceitos é o primeiro passo para uma vida ética.
+        * **Combate ao relativismo:** A busca por conceitos universais era uma oposição direta ao relativismo sofístico, que poderia levar à manipulação da verdade e à desordem moral.
+        * **Base para a ciência e a filosofia:** Essa busca pela essência e pela definição universal abriu caminho para o desenvolvimento da lógica, da teoria do conhecimento e da própria filosofia como um campo de investigação racional e sistemática.
+        * **Autoconhecimento:** Ao questionar e refinar seus próprios conceitos, o indivíduo era levado a uma profunda reflexão sobre si mesmo e seus valores.
+
+        A busca socrática pelo conceito é, portanto, um exercício de clareza intelectual e um pilar para a construção de um pensamento filosófico mais rigoroso e ético.`,
+        quiz: [
+          {
+            pergunta: "Qual o principal objetivo da 'Busca pelo Conceito' em Sócrates?",
+            opcoes: ["Provar que ninguém sabe nada", "Conhecer a si mesmo", "Chegar a definições universais e objetivas de conceitos", "Convencer os outros de suas ideias"],
+            correta: 2
+          },
+          {
+            pergunta: "Sócrates se opunha a qual corrente filosófica que defendia o relativismo da verdade?",
+            opcoes: ["Pré-Socráticos", "Atomistas", "Sofistas", "Epicuristas"],
+            correta: 2
+          },
+          {
+            pergunta: "A busca pelo conceito em Sócrates estava ligada a qual de suas principais ideias?",
+            opcoes: ["O Ser é imóvel", "A virtude é conhecimento", "Tudo flui", "Os números governam o universo"],
+            correta: 1
+          },
+          {
+            pergunta: "Qual das etapas do Método Socrático é fundamental para a busca do conceito, levando o interlocutor a perceber contradições?",
+            opcoes: ["Maiêutica", "Diálogo Aparente", "Ironia", "Dedução"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual o propósito de se definir claramente conceitos como justiça ou coragem para Sócrates?",
+            opcoes: ["Apenas para argumentar melhor", "Para acumular conhecimento inútil", "Para viver uma vida boa e virtuosa", "Para ensinar os outros o que é certo"],
+            correta: 2
+          }
+        ]
+      },
+      'filosofia-teoriaIdeias': {
+        titulo: "Teoria das Ideias (Platão)",
+        texto: `A Teoria das Ideias (ou Teoria das Formas) é a mais central e influente doutrina da filosofia de Platão, desenvolvida a partir dos ensinamentos de seu mestre Sócrates e em oposição ao relativismo sofístico e ao fluxo constante de Heráclito. Para Platão, a realidade não se restringe ao mundo que percebemos pelos nossos sentidos, que é imperfeito e em constante mudança. Ele postulou a existência de dois mundos distintos:
+
+        1.  **Mundo Sensível (ou Mundo das Aparências):** É o mundo que experimentamos através dos nossos cinco sentidos. É o mundo material, dos objetos concretos, que é imperfeito, mutável, perecível e, portanto, uma cópia ou sombra de uma realidade superior. O conhecimento obtido neste mundo é mero **opinião (doxa)**, pois é instável e ilusório.
+
+        2.  **Mundo Inteligível (ou Mundo das Ideias/Formas):** É o mundo da verdadeira realidade, acessível apenas pela **razão** e pelo intelecto. Neste mundo, existem as **Ideias (ou Formas)**, que são entidades perfeitas, eternas, imutáveis, universais e imateriais. As Ideias são os modelos originais de tudo o que existe no Mundo Sensível. Por exemplo, todas as cadeiras que vemos (no mundo sensível) são apenas cópias imperfeitas da Ideia perfeita de "Cadeira" que existe no Mundo Inteligível. A Ideia mais elevada de todas é a **Ideia do Bem** (ou do Sol, na alegoria da caverna), que ilumina e dá sentido a todas as outras. O conhecimento obtido neste mundo é a **verdade (episteme)**.
+
+        **Alegoria da Caverna:** Platão ilustra sua Teoria das Ideias com a famosa "Alegoria da Caverna", onde prisioneiros acorrentados veem apenas as sombras de objetos projetadas na parede (Mundo Sensível), confundindo-as com a realidade. A libertação de um prisioneiro, que sai da caverna e vê a luz do sol e os objetos reais (Mundo Inteligível), simboliza o processo filosófico de ascensão do conhecimento, da opinião à verdade, da escuridão à luz da razão.
+
+        **Implicações:**
+        * **Teoria do Conhecimento (Epistemologia):** O verdadeiro conhecimento é sobre as Ideias, e não sobre as coisas sensíveis. O aprendizado é, em grande parte, a recordação (anamnese) das Ideias que a alma já conhecia antes de encarnar.
+        * **Metafísica:** A realidade última não é material, mas ideal.
+        * **Ética e Política:** A justiça, a beleza e a virtude são Ideias perfeitas que os seres humanos e as cidades devem buscar imitar. O governante ideal seria o filósofo-rei, aquele que ascendeu ao conhecimento das Ideias.
+
+        A Teoria das Ideias de Platão teve um impacto monumental na filosofia ocidental, moldando discussões sobre a realidade, o conhecimento, a alma e a política por milênios.`,
+        quiz: [
+          {
+            pergunta: "Qual filósofo desenvolveu a Teoria das Ideias?",
+            opcoes: ["Sócrates", "Aristóteles", "Platão", "Heráclito"],
+            correta: 2
+          },
+          {
+            pergunta: "Para Platão, o mundo que percebemos pelos sentidos é chamado de:",
+            opcoes: ["Mundo Inteligível", "Mundo das Ideias", "Mundo Perfeito", "Mundo Sensível ou das Aparências"],
+            correta: 3
+          },
+          {
+            pergunta: "Onde residem as Formas ou Ideias perfeitas e eternas, segundo Platão?",
+            opcoes: ["No mundo material", "Na mente humana", "No Mundo Inteligível", "No tempo e espaço"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual das seguintes obras de Platão ilustra a Teoria das Ideias através de uma famosa alegoria?",
+            opcoes: ["Apologia de Sócrates", "Crítias", "A República (Alegoria da Caverna)", "O Banquete"],
+            correta: 2
+          },
+          {
+            pergunta: "Para Platão, o conhecimento verdadeiro (episteme) é obtido a partir de qual mundo?",
+            opcoes: ["Do mundo das ilusões", "Do mundo que experimentamos", "Do Mundo Inteligível (das Ideias)", "Do mundo dos mitos"],
+            correta: 2
+          }
+        ]
+      },
+      'filosofia-filosofiaPrimeiro': {
+        titulo: "A Filosofia Primeira (Aristóteles)",
+        texto: `Aristóteles, discípulo de Platão e um dos maiores pensadores da história, abordou o que ele chamou de **"Filosofia Primeira"** em sua obra que, posteriormente, seria conhecida como **Metafísica**. Diferentemente de Platão, que via a realidade principal em um mundo separado de ideias perfeitas, Aristóteles acreditava que a essência das coisas (suas "formas") não estava em um mundo transcendente, mas **inerente aos próprios seres do mundo sensível**.
+
+        A Filosofia Primeira é, para Aristóteles, a ciência que estuda o **ser enquanto ser** (o ser em seu aspecto mais fundamental e universal), ou seja, as causas e os princípios primeiros de tudo o que existe. Ele a chamava de "teologia" também, pois investigava o **Primeiro Motor Imóvel**, que seria a causa final e eficiente de todo o movimento no universo, mas que em si mesmo não se move.
+
+        **Principais conceitos da Filosofia Primeira (Metafísica):**
+        * **Substância (Ousia):** O conceito central. A substância é aquilo que subsiste por si mesmo e que serve de substrato para as qualidades. Há duas substâncias:
+            * **Substância Primeira:** O indivíduo concreto e particular (ex: "este homem", "este cavalo").
+            * **Substância Segunda:** A espécie e o gênero (ex: "homem", "cavalo"), que são universais e só existem nas substâncias primeiras.
+        * **Forma e Matéria (Hilemorfismo):** Todo ser no mundo sensível é um composto indissolúvel de **matéria** (aquilo de que algo é feito, a potência) e **forma** (aquilo que algo é, a essência, a atualidade). A forma confere identidade e inteligibilidade à matéria. Ex: a matéria é a madeira, a forma é a mesa.
+        * **Potência e Ato:**
+            * **Potência:** A capacidade de ser ou de se tornar algo. É a matéria em sua possibilidade de assumir uma forma. Ex: a semente é uma árvore em potência.
+            * **Ato:** A realização da potência, a existência em sua plenitude. É a forma atualizada na matéria. Ex: a árvore é a semente em ato. Todo movimento é a passagem da potência ao ato.
+        * **Primeiro Motor Imóvel:** A causa primeira de todo movimento e mudança no universo. Ele move todas as coisas, mas não é movido por nada, sendo ato puro, sem potência.
+
+        A Filosofia Primeira de Aristóteles estabeleceu os fundamentos da metafísica ocidental, investigando as questões mais profundas sobre a natureza da realidade, da existência e do conhecimento. Sua abordagem empírica e lógica, focada no mundo sensível, contrastou com o idealismo de Platão e influenciou o pensamento científico e filosófico por séculos.`,
+        quiz: [
+          {
+            pergunta: "Qual o nome da obra de Aristóteles que trata da 'Filosofia Primeira'?",
+            opcoes: ["A República", "Ética a Nicômaco", "Metafísica", "Organon"],
+            correta: 2
+          },
+          {
+            pergunta: "Para Aristóteles, a essência das coisas está:",
+            opcoes: ["Em um mundo de ideias separadas", "Inerente aos próprios seres do mundo sensível", "Apenas na mente humana", "Nas estrelas"],
+            correta: 1
+          },
+          {
+            pergunta: "O que Aristóteles investiga na Filosofia Primeira (Metafísica)?",
+            opcoes: ["A ética política", "O ser enquanto ser e suas causas primeiras", "A retórica e a oratória", "A matemática dos números"],
+            correta: 1
+          },
+          {
+            pergunta: "Qual conceito aristotélico se refere à capacidade de ser ou de se tornar algo?",
+            opcoes: ["Ato", "Forma", "Matéria", "Potência"],
+            correta: 3
+          },
+          {
+            pergunta: "O que o 'Primeiro Motor Imóvel' de Aristóteles faz?",
+            opcoes: ["Cria a matéria e a forma", "Move todas as coisas, mas não é movido por nada", "É a causa de toda ilusão", "É o princípio do não-ser"],
+            correta: 1
+          }
+        ]
+      },
+      'filosofia-4causas': {
+        titulo: "Teoria das 4 Causas (Aristóteles)",
+        texto: `Aristóteles, em sua busca por compreender o "porquê" das coisas, desenvolveu a **Teoria das Quatro Causas**, uma ferramenta conceitual fundamental para analisar e explicar a natureza de qualquer ser ou fenômeno. Para ele, conhecer algo em plenitude significa conhecer suas causas. As quatro causas são:
+
+        1.  **Causa Material:** É aquilo **de que** algo é feito, a matéria-prima, o substrato do qual a coisa se constitui. É a potência da coisa, o que tem a capacidade de vir a ser.
+            * *Exemplo:* Para uma estátua, a causa material é o mármore. Para uma mesa, a madeira.
+
+        2.  **Causa Formal:** É aquilo **que** algo é, sua essência, a forma ou o modelo que a coisa adquire. É o que define a natureza de um ser, sua estrutura, sua identidade.
+            * *Exemplo:* Para uma estátua, a causa formal é a figura que o mármore adquire (ex: a forma de uma pessoa). Para uma mesa, é o design e a estrutura de "mesa".
+
+        3.  **Causa Eficiente:** É aquilo **pelo qual** algo é feito, o agente que produz a coisa, a força que inicia o movimento ou a mudança. É a origem do processo.
+            * *Exemplo:* Para uma estátua, a causa eficiente é o escultor. Para uma mesa, o carpinteiro.
+
+        4.  **Causa Final:** É aquilo **para que** algo é feito, o propósito, o objetivo, a finalidade da coisa. É o télos (fim) para o qual o ser tende ou foi concebido. Aristóteles considerava esta a mais importante das causas, pois a natureza opera com finalidades.
+            * *Exemplo:* Para uma estátua, a causa final pode ser homenagear alguém ou decorar um local. Para uma mesa, é servir para colocar objetos, comer, trabalhar.
+
+        **Inter-relação das causas:**
+        As quatro causas não são independentes, mas complementares. Para Aristóteles, a compreensão completa de um objeto ou evento requer a análise de todas as suas causas. Por exemplo, uma casa (objeto) é feita de tijolos e madeira (material), tem o formato de uma casa (formal), foi construída por um arquiteto e operários (eficiente), e tem o propósito de abrigar pessoas (final).
+
+        A Teoria das Quatro Causas foi fundamental para o desenvolvimento da lógica, da física, da biologia e da metafísica aristotélica, e influenciou profundamente o pensamento ocidental por séculos, sendo uma ferramenta essencial para a compreensão da realidade e da natureza das coisas.`,
+        quiz: [
+          {
+            pergunta: "Qual filósofo desenvolveu a Teoria das Quatro Causas?",
+            opcoes: ["Platão", "Sócrates", "Aristóteles", "Parmênides"],
+            correta: 2
+          },
+          {
+            pergunta: "A causa que se refere ao material 'de que' algo é feito é a causa:",
+            opcoes: ["Formal", "Eficiente", "Final", "Material"],
+            correta: 3
+          },
+          {
+            pergunta: "O carpinteiro que constrói uma mesa representa qual tipo de causa?",
+            opcoes: ["Causa Material", "Causa Formal", "Causa Eficiente", "Causa Final"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual causa explica o 'propósito' ou 'finalidade' de algo?",
+            opcoes: ["Causa Material", "Causa Formal", "Causa Eficiente", "Causa Final"],
+            correta: 3
+          },
+          {
+            pergunta: "A forma ou essência que uma coisa adquire (ex: o formato de uma estátua) é a causa:",
+            opcoes: ["Material", "Formal", "Eficiente", "Final"],
+            correta: 1
+          }
+        ]
+      },
+      'filosofia-feRazao': {
+        titulo: "Europa Cristianizada: Fé e Razão",
+        texto: `O período da Europa cristianizada, especialmente a Idade Média, foi marcado por um intenso debate e uma busca pela conciliação entre a **fé** (revelada pela teologia cristã) e a **razão** (representada pela filosofia grega, redescoberta através de pensadores como Aristóteles). Filósofos e teólogos medievais não viam fé e razão como necessariamente opostas, mas como caminhos complementares para a verdade, ambos originários de Deus.
+
+        **Principais abordagens:**
+        * **Agostinho de Hipona (Patrística - séc. IV-V):** Um dos primeiros e mais influentes pensadores cristãos a tentar conciliar a fé com a razão. Inspirado em Platão, Agostinho defendia que a fé é o ponto de partida para a compreensão ("Creio para que eu compreenda"). A razão serve para iluminar e aprofundar a fé, mas não para questioná-la fundamentalmente. A verdade última é Deus.
+        * **Escolástica (séc. IX-XV):** Movimento filosófico e teológico predominante nas universidades medievais. Buscava conciliar a fé cristã com a filosofia clássica (especialmente Aristóteles), utilizando a razão para sistematizar e defender os dogmas da fé.
+            * **Anselmo de Cantuária (séc. XI):** Criou o "argumento ontológico" para a existência de Deus ("Deus é aquilo do qual nada maior pode ser pensado"). Também acreditava na primazia da fé: "Não busco compreender para crer, mas creio para compreender".
+            * **Tomás de Aquino (séc. XIII):** O maior expoente da Escolástica e um dos maiores teólogos e filósofos da Igreja Católica. Sua obra principal, a *Suma Teológica*, tentou uma síntese monumental entre a filosofia aristotélica e a teologia cristã. Tomás de Aquino defendia que a fé e a razão são duas vias distintas, mas que podem se complementar. A razão pode provar a existência de Deus (as "cinco vias" de Tomás) e algumas verdades da fé, enquanto outras verdades (como a Trindade) são mistérios que só podem ser alcançados pela fé, mas não são irracionais. Para ele, a graça (fé) aperfeiçoa a natureza (razão).
+
+        **Desafios e Tensões:**
+        Apesar da busca pela conciliação, a relação entrefé e razão nem sempre foi harmoniosa. Houve momentos de tensão, especialmente quando as conclusões da razão pareciam contradizer os dogmas da Igreja. A Igreja Católica, por vezes, controlou o acesso a certos textos filosóficos e científicos para preservar a ortodoxia da fé. No entanto, o debate entre fé e razão estimulou um intenso desenvolvimento intelectual na Idade Média, que lançou as bases para o Renascimento e a Revolução Científica. A questão da relação entre fé e razão permanece relevante na filosofia e teologia até hoje.`,
+        quiz: [
+          {
+            pergunta: "Qual era a principal questão filosófica debatida na Europa cristianizada, especialmente na Idade Média?",
+            opcoes: ["A origem do cosmos", "A relação entre fé e razão", "A estrutura do átomo", "A existência de alienígenas"],
+            correta: 1
+          },
+          {
+            pergunta: "Qual filósofo cristão antigo defendia 'Creio para que eu compreenda', priorizando a fé para o entendimento?",
+            opcoes: ["Tomás de Aquino", "Anselmo de Cantuária", "Agostinho de Hipona", "Sócrates"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual movimento filosófico medieval buscou conciliar a fé cristã com a filosofia aristotélica?",
+            opcoes: ["Patrística", "Iluminismo", "Escolástica", "Racionalismo"],
+            correta: 2
+          },
+          {
+            pergunta: "Quem é considerado o maior expoente da Escolástica e autor da *Suma Teológica*?",
+            opcoes: ["Agostinho de Hipona", "Anselmo de Cantuária", "Tomás de Aquino", "Platão"],
+            correta: 2
+          },
+          {
+            pergunta: "Para Tomás de Aquino, fé e razão são vias:",
+            opcoes: ["Opostas e excludentes", "Idênticas e uma dispensa a outra", "Distintas, mas complementares", "Inexistentes"],
+            correta: 2
+          }
+        ]
+      },
+
+      // ##################### SOCIOLOGIA #####################
+      'sociologia-capitalismo': {
+        titulo: "Capitalismo",
+        texto: `O **capitalismo** é um sistema econômico e social que se baseia na propriedade privada dos meios de produção (terras, fábricas, máquinas), na busca pelo lucro e na liberdade de mercado. Surgiu e se consolidou na Europa a partir do final da Idade Média, com o declínio do feudalismo e o desenvolvimento do comércio e das cidades. A Revolução Industrial, no século XVIII, acelerou sua expansão, transformando a produção artesanal em industrial e consolidando a figura do trabalhador assalariado.
+
+        As **principais características** do capitalismo incluem:
+        * **Propriedade Privada:** A maior parte dos bens de produção pertence a indivíduos ou empresas privadas.
+        * **Busca pelo Lucro:** O objetivo principal da produção e da atividade econômica é gerar lucro para os proprietários do capital.
+        * **Economia de Mercado:** Os preços dos produtos e serviços são determinados pela oferta e demanda no mercado, com pouca ou nenhuma intervenção estatal.
+        * **Divisão do Trabalho:** Especialização das tarefas na produção, visando maior eficiência e produtividade.
+        * **Trabalho Assalariado:** A maioria das pessoas vende sua força de trabalho em troca de um salário.
+        * **Livre Concorrência:** Empresas competem entre si para atrair consumidores.
+
+        Ao longo da história, o capitalismo passou por diversas fases, como o **Capitalismo Comercial** (mercantilismo), o **Capitalismo Industrial** e o **Capitalismo Financeiro** (com predominância de bancos, bolsas de valores e grandes corporações).
+
+        **Impactos e Consequências:**
+        O capitalismo trouxe avanços tecnológicos e um aumento significativo na produção de bens e serviços, elevando o padrão de vida em muitas partes do mundo. No entanto, também é associado a:
+        * **Desigualdade Social:** A concentração de riqueza e renda tende a aumentar, gerando grandes disparidades entre ricos e pobres.
+        * **Crises Econômicas:** Períodos de superprodução, especulação e bolhas financeiras podem levar a recessões e desemprego.
+        * **Consumo Incentivado:** A publicidade e a obsolescência programada estimulam o consumo constante, gerando impactos ambientais.
+        * **Exploração de Recursos Naturais:** A busca incessante por lucro pode levar à exploração insustentável dos recursos e à degradação ambiental.
+        * **Globalização:** O capitalismo impulsionou a interconexão econômica e cultural entre os países.
+
+        Existem diferentes abordagens e críticas ao capitalismo, que variam desde propostas de regulamentação estatal (como no **Estado de Bem-Estar Social**) até a defesa de sistemas alternativos (como o socialismo ou o comunismo). A discussão sobre os benefícios e desafios do capitalismo continua sendo central no debate socioeconômico global.`,
+        quiz: [
+          {
+            pergunta: "Qual a base fundamental do sistema capitalista?",
+            opcoes: ["Propriedade estatal dos meios de produção", "Propriedade privada dos meios de produção", "Coletivização da terra", "Economia planificada"],
+            correta: 1
+          },
+          {
+            pergunta: "Qual o principal objetivo da produção no capitalismo?",
+            opcoes: ["Distribuir renda igualmente", "Gerar lucro", "Eliminar as classes sociais", "Preservar o meio ambiente a todo custo"],
+            correta: 1
+          },
+          {
+            pergunta: "A Revolução Industrial foi fundamental para qual fase do capitalismo?",
+            opcoes: ["Capitalismo Comercial", "Capitalismo Industrial", "Capitalismo Financeiro", "Mercantilismo"],
+            correta: 1
+          },
+          {
+            pergunta: "Em um sistema capitalista, quem determina os preços dos produtos e serviços?",
+            opcoes: ["O governo", "Um comitê central", "A oferta e demanda no mercado", "Sindicatos"],
+            correta: 2
+          },
+          {
+            pergunta: "A maioria das pessoas no capitalismo vende o quê em troca de um salário?",
+            opcoes: ["Sua propriedade", "Sua força de trabalho", "Seus produtos artesanais", "Suas ideias políticas"],
+            correta: 1
+          }
+        ]
+      },
+      'sociologia-bullyingCyberbullying': {
+        titulo: "Bullying e Cyberbullying",
+        texto: `**Bullying** e **Cyberbullying** são formas de violência que se manifestam de diversas maneiras, causando sofrimento e danos psicológicos e, por vezes, físicos às vítimas. Ambos são comportamentos intencionais e repetitivos, exercidos com o objetivo de intimidar, humilhar, agredir ou excluir alguém.
+
+        **Bullying Tradicional:**
+        O bullying ocorre em ambientes físicos, como escolas, trabalho ou outros espaços de convivência social. Pode ser:
+        * **Físico:** Agressões como socos, chutes, empurrões, furtos ou destruição de pertences.
+        * **Verbal:** Insultos, apelidos pejorativos, provocações, fofocas.
+        * **Psicológico/Moral:** Exclusão social, intimidação, difamação, boatos, chantagem, manipulação.
+        * **Sexual:** Assédio, comentários ou gestos de cunho sexual.
+
+        **Cyberbullying:**
+        Com o avanço da tecnologia e o uso massivo da internet e redes sociais, o bullying ganhou uma nova dimensão: o **cyberbullying**. Ele ocorre no ambiente virtual e possui características que o tornam particularmente perigoso:
+        * **Anonimato:** Os agressores podem se sentir mais seguros ao se esconderem atrás de perfis falsos ou mensagens anônimas, o que dificulta a identificação e a punição.
+        * **Alcance e Permanência:** Uma mensagem ou imagem difamatória pode ser compartilhada rapidamente com um grande número de pessoas e permanecer online por tempo indeterminado, potencializando o sofrimento da vítima.
+        * **Ausência de feedback imediato:** O agressor não vê a reação imediata da vítima, o que pode levar a uma menor empatia e a atos mais severos.
+        * **Tipos:** Publicação de fotos ou vídeos vexatórios, espalhar boatos online, criar grupos para difamar, envio de mensagens ameaçadoras ou de ódio, invasão de perfis.
+
+        **Impactos para as vítimas:**
+        Tanto o bullying quanto o cyberbullying podem ter graves consequências para as vítimas, incluindo:
+        * Baixa autoestima, ansiedade, depressão.
+        * Problemas de sono e alimentação.
+        * Queda no rendimento escolar/profissional.
+        * Isolamento social.
+        * Em casos extremos, ideação suicida.
+
+        **Prevenção e Combate:**
+        É fundamental que escolas, famílias, empresas e a sociedade em geral atuem na prevenção e no combate a essas práticas. Isso inclui educação sobre o uso responsável da tecnologia, conscientização, canais de denúncia, e o apoio psicossocial às vítimas e, quando necessário, aos agressores. A legislação também tem se tornado mais rigorosa para punir esses crimes.`,
+        quiz: [
+          {
+            pergunta: "Qual a principal característica que diferencia o bullying do cyberbullying?",
+            opcoes: ["A gravidade do ato", "A idade dos envolvidos", "O ambiente onde ocorre (físico vs. virtual)", "A intenção do agressor"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual das seguintes opções é um tipo de bullying físico?",
+            opcoes: ["Espalhar fofocas", "Excluir alguém de um grupo", "Socar ou empurrar", "Enviar mensagens anônimas"],
+            correta: 2
+          },
+          {
+            pergunta: "Uma das características do cyberbullying que potencializa o dano à vítima é:",
+            opcoes: ["A visibilidade imediata da reação da vítima", "O anonimato e o grande alcance/permanência do conteúdo online", "A limitação de compartilhamento", "O controle total da vítima sobre a situação"],
+            correta: 1
+          },
+          {
+            pergunta: "Qual das consequências abaixo NÃO está tipicamente associada ao bullying/cyberbullying para a vítima?",
+            opcoes: ["Depressão e ansiedade", "Aumento da autoestima", "Queda no rendimento escolar", "Isolamento social"],
+            correta: 1
+          },
+          {
+            pergunta: "A legislação e a educação sobre o uso da tecnologia são importantes para:",
+            opcoes: ["Incentivar o anonimato online", "Promover o cyberbullying", "Prevenir e combater o bullying e cyberbullying", "Aumentar a interação agressiva"],
+            correta: 2
+          }
+        ]
+      },
+      'sociologia-abusoExploracaoSexual': {
+        titulo: "Abuso e Exploração Sexual",
+        texto: `O **abuso sexual** e a **exploração sexual** são graves violações dos direitos humanos, especialmente de crianças e adolescentes, que causam danos profundos e duradouros às vítimas. Ambos envolvem o uso do poder ou da confiança para compelir alguém a participar de atividades sexuais sem consentimento.
+
+        **Abuso Sexual:**
+        Refere-se a qualquer ato sexual com uma criança ou adolescente, ou com um adulto vulnerável (por incapacidade física, mental ou emocional), realizado por alguém em posição de poder, autoridade ou confiança (pais, parentes, professores, líderes religiosos, vizinhos, etc.). É uma violência na qual a vítima não tem a capacidade plena de consentir ou é coagida.
+        * Pode envolver contato físico (toques, carícias, penetração) ou não-físico (exposição a pornografia, observação de atos sexuais, conversas de cunho sexual).
+        * Frequentemente, o abuso ocorre no ambiente familiar ou próximo, o que dificulta a denúncia pela vítima e a identificação por terceiros.
+        * A violência se dá na relação de poder e dependência, onde a criança ou adolescente não tem autonomia para se proteger.
+
+        **Exploração Sexual:**
+        É a utilização comercial da sexualidade de crianças, adolescentes ou adultos vulneráveis. Ocorre quando a pessoa é submetida a práticas sexuais em troca de algum tipo de vantagem ou benefício (dinheiro, bens, moradia, drogas, etc.) para o explorador. Não necessariamente envolve coação direta, mas se aproveita da vulnerabilidade social e econômica da vítima.
+        * Exemplos incluem: prostituição infantil, pornografia infantil (produção e distribuição de imagens), turismo sexual de menores, tráfico de pessoas para fins de exploração sexual.
+        * Diferente do abuso, a exploração tem um componente de lucro ou benefício para o agressor/explorador.
+        * Pode ser realizada por indivíduos ou por redes organizadas.
+
+        **Consequências para as Vítimas:**
+        Os impactos do abuso e da exploração sexual são devastadores e podem incluir:
+        * **Danos psicológicos:** Trauma, ansiedade, depressão, baixa autoestima, distúrbios alimentares e do sono, problemas de relacionamento, automutilação, ideação suicida.
+        * **Danos físicos:** Lesões, doenças sexualmente transmissíveis (DSTs), gravidez indesejada.
+        * **Danos sociais:** Dificuldade de aprendizado, isolamento, estigmatização.
+
+        **Denúncia e Combate:**
+        A denúncia é crucial para combater esses crimes. No Brasil, canais como o Disque 100, Conselhos Tutelares, Polícia Civil (Delegacias de Proteção à Criança e ao Adolescente) e o Ministério Público estão disponíveis para receber denúncias. A sociedade tem um papel fundamental na proteção de crianças e adolescentes, quebrando o ciclo do silêncio e da impunidade. Campanhas de conscientização e educação são vitais para que as vítimas e suas famílias saibam onde buscar ajuda.`,
+        quiz: [
+          {
+            pergunta: "Qual a principal diferença entre abuso sexual e exploração sexual?",
+            opcoes: ["Abuso é sempre físico, exploração é só verbal.", "Abuso é só com adultos, exploração é só com crianças.", "Exploração tem um componente de lucro ou benefício para o agressor, abuso não.", "Não há diferença, são sinônimos."],
+            correta: 2
+          },
+          {
+            pergunta: "O abuso sexual geralmente envolve uma relação de:",
+            opcoes: ["Amizade e consentimento mútuo", "Poder, autoridade ou confiança do agressor sobre a vítima", "Total desconhecimento entre as partes", "Negociação comercial justa"],
+            correta: 1
+          },
+          {
+            pergunta: "Qual dos exemplos abaixo é uma forma de exploração sexual?",
+            opcoes: ["Um toque indesejado de um desconhecido", "Publicação de imagens de pornografia infantil", "Um comentário sexual em público", "Um beijo forçado"],
+            correta: 1
+          },
+          {
+            pergunta: "Qual o impacto psicológico mais comum para as vítimas de abuso ou exploração sexual?",
+            opcoes: ["Aumento da autoconfiança", "Desenvolvimento de novas habilidades", "Trauma, ansiedade e depressão", "Melhora no desempenho escolar"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual canal de denúncia no Brasil pode ser utilizado para casos de abuso e exploração sexual?",
+            opcoes: ["Disque 190 (emergência policial)", "Disque 100", "Serviço de atendimento ao consumidor", "Central de informações turísticas"],
+            correta: 1
+          }
+        ]
+      },
+
+      // ##################### GEOGRAFIA #####################
+      'geo-problematicaAmbientalMundo': {
+        titulo: "A Problemática Ambiental no Mundo",
+        texto: `A **problemática ambiental no mundo** refere-se ao conjunto de desafios e crises ecológicas que a humanidade enfrenta atualmente, resultantes principalmente da ação humana sobre o planeta. Essas questões não respeitam fronteiras geográficas e afetam a qualidade de vida e o futuro das gerações.
+
+        **Principais desafios globais:**
+        * **Mudanças Climáticas:** Talvez o maior desafio. Causadas principalmente pela emissão de gases de efeito estufa (CO2, metano) provenientes da queima de combustíveis fósseis (indústria, transporte, energia) e do desmatamento. Resultam em aumento da temperatura global, eventos climáticos extremos (secas prolongadas, inundações, ondas de calor, tempestades intensas), elevação do nível do mar, derretimento de geleiras e acidificação dos oceanos.
+        * **Perda de Biodiversidade:** A taxa de extinção de espécies (animais e vegetais) é alarmante, impulsionada pela destruição de habitats (desmatamento, urbanização), poluição, mudanças climáticas, espécies invasoras e superexploração de recursos. A biodiversidade é essencial para o equilíbrio dos ecossistemas e para a vida humana.
+        * **Poluição:** Contaminação do ar, da água e do solo por resíduos industriais, agrícolas, urbanos e químicos.
+            * **Poluição do ar:** Responsável por doenças respiratórias e pelo efeito estufa.
+            * **Poluição da água:** Afeta a saúde humana e a vida aquática, gerando escassez de água potável.
+            * **Poluição do solo:** Contamina alimentos e ecossistemas.
+            * **Poluição plástica:** Grande acúmulo de plásticos em oceanos e solos, com impactos duradouros.
+        * **Escassez e Má Gestão da Água:** A distribuição desigual e o desperdício de água, somados à poluição e às mudanças climáticas, levam à crise hídrica em muitas regiões, afetando a agricultura, a indústria e o abastecimento humano.
+        * **Desmatamento e Desertificação:** A remoção de florestas para agricultura, pecuária, mineração e urbanização resulta na perda de biodiversidade, erosão do solo, alteração de regimes de chuva e contribuição para as mudanças climáticas. A desertificação é o avanço de áreas desérticas devido à degradação do solo.
+        * **Má Gestão de Resíduos Sólidos:** A produção crescente de lixo e a falta de sistemas adequados de coleta, tratamento e descarte geram lixões a céu aberto, poluição do solo e da água, emissão de gases e proliferação de doenças.
+
+        **Soluções e Desafios:**
+        A resolução desses problemas exige ações complexas e coordenadas em níveis local, nacional e global. Inclui a transição para energias renováveis, o desenvolvimento sustentável, a economia circular, a conservação de ecossistemas, o consumo consciente, a educação ambiental e políticas públicas eficazes. A conscientização e o engajamento de indivíduos, empresas e governos são cruciais para garantir um futuro sustentável para o planeta.`,
+        quiz: [
+          {
+            pergunta: "Qual é considerado um dos maiores desafios ambientais globais atualmente?",
+            opcoes: ["Aumento da produção de alimentos", "Crescimento populacional", "Mudanças Climáticas", "Aumento da expectativa de vida"],
+            correta: 2
+          },
+          {
+            pergunta: "A queima de combustíveis fósseis contribui principalmente para qual problema ambiental?",
+            opcoes: ["Escassez de água", "Desertificação", "Perda de biodiversidade", "Mudanças Climáticas"],
+            correta: 3
+          },
+          {
+            pergunta: "A destruição de habitats e a poluição são grandes causas de qual problema?",
+            opcoes: ["Melhora da qualidade do ar", "Aumento da produção de energia", "Perda de Biodiversidade", "Recuperação de solos"],
+            correta: 2
+          },
+          {
+            pergunta: "O que a poluição plástica em oceanos e solos representa?",
+            opcoes: ["Um recurso renovável", "Um problema de baixo impacto ambiental", "Um acúmulo de resíduos com impactos duradouros", "Uma fonte de energia limpa"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual das seguintes ações NÃO é uma solução para os problemas ambientais?",
+            opcoes: ["Transição para energias renováveis", "Desmatamento acelerado", "Consumo consciente", "Reciclagem"],
+            correta: 1
+          }
+        ]
+      },
+      'geo-oQueEMeioAmbiente': {
+        titulo: "O que é Meio Ambiente?",
+        texto: `O conceito de **meio ambiente** é muito mais abrangente do que simplesmente a natureza intocada. Ele se refere ao conjunto complexo de **interações e interdependências entre os elementos naturais e artificiais** que existem na Terra e que influenciam e sustentam a vida em todas as suas formas. É, em essência, o espaço onde a vida acontece e todas as condições que a tornam possível.
+
+        Podemos classificar os elementos do meio ambiente em:
+        * **Elementos Naturais (bióticos e abióticos):**
+            * **Físicos/Abióticos:** Componentes não vivos como o ar (atmosfera), a água (hidrosfera), o solo (litosfera), o clima, a luz solar, a temperatura, os minerais.
+            * **Biológicos/Bióticos:** Componentes vivos como a flora (plantas), a fauna (animais), os microrganismos (bactérias, fungos, vírus).
+        * **Elementos Artificiais (sociais e culturais):**
+            * **Culturais/Socioeconômicos:** Incluem as criações humanas como cidades, infraestruturas (estradas, edifícios), tecnologias, sistemas econômicos, leis, culturas, tradições, e a própria organização social. A ação humana molda e é moldada pelo meio ambiente.
+
+        **Interconexão e Dinamismo:**
+        O meio ambiente é um sistema dinâmico, onde todos os seus componentes estão interligados. Uma alteração em um elemento pode gerar impactos em outros. Por exemplo, o desmatamento (ação humana) afeta o clima, o solo, a biodiversidade e os ciclos da água.
+
+        **Importância do Conceito:**
+        A compreensão do meio ambiente em sua totalidade (natural e construída) é fundamental para abordar questões como:
+        * **Sustentabilidade:** A capacidade de satisfazer as necessidades do presente sem comprometer a capacidade das futuras gerações de satisfazerem suas próprias necessidades. Isso exige um equilíbrio entre desenvolvimento econômico, justiça social e proteção ambiental.
+        * **Desenvolvimento Sustentável:** Um desenvolvimento que integra as dimensões econômica, social e ambiental, buscando um crescimento que não esgote os recursos naturais e que promova a equidade.
+        * **Educação Ambiental:** A conscientização e a formação de cidadãos capazes de agir de forma responsável em relação ao meio ambiente.
+
+        Em suma, o meio ambiente é o palco da vida, um sistema complexo e integrado que necessita de cuidado e gestão para garantir a sua resiliência e a continuidade da vida no planeta.`,
+        quiz: [
+          {
+            pergunta: "O conceito de 'meio ambiente' abrange quais tipos de elementos?",
+            opcoes: ["Somente elementos biológicos", "Apenas elementos físicos", "Somente elementos artificiais", "Elementos naturais e artificiais interligados"],
+            correta: 3
+          },
+          {
+            pergunta: "Qual das opções abaixo é um exemplo de elemento abiótico (não vivo) do meio ambiente?",
+            opcoes: ["Plantas", "Animais", "Água", "Bactérias"],
+            correta: 2
+          },
+          {
+            pergunta: "As cidades e a tecnologia são exemplos de quais elementos do meio ambiente?",
+            opcoes: ["Elementos naturais", "Elementos biológicos", "Elementos artificiais ou socioculturais", "Elementos químicos"],
+            correta: 2
+          },
+          {
+            pergunta: "O que acontece quando uma alteração em um elemento do meio ambiente ocorre?",
+            opcoes: ["Apenas aquele elemento é afetado", "Não há impactos em outros elementos", "Pode gerar impactos em outros elementos devido à interconexão", "O sistema se isola da alteração"],
+            correta: 2
+          },
+          {
+            pergunta: "A sustentabilidade busca conciliar o desenvolvimento com a conservação de recursos para:",
+            opcoes: ["Apenas a geração presente", "Apenas as futuras gerações", "As gerações presentes e futuras", "Somente os países ricos"],
+            correta: 2
+          }
+        ]
+      },
+      'geo-meioAmbientePatrimonioGenetico': {
+        titulo: "Meio Ambiente: Patrimônio Genético",
+        texto: `O **patrimônio genético** é um componente essencial do meio ambiente e da biodiversidade. Ele se refere à totalidade de informações genéticas contidas nos genes de todas as espécies de seres vivos (animais, vegetais, microrganismos) que habitam um ecossistema, uma região ou o planeta. Representa a variabilidade biológica fundamental para a adaptação, evolução e resiliência dos ecossistemas.
+
+        **Importância do Patrimônio Genético:**
+        * **Base da Biodiversidade:** É a matéria-prima da evolução. A diversidade genética dentro de uma espécie e entre espécies permite que elas se adaptem a mudanças ambientais, resistam a pragas e doenças, e se desenvolvam.
+        * **Recursos para a Humanidade:** O patrimônio genético é uma fonte inestimável de recursos para diversas áreas:
+            * **Medicina e Farmacologia:** Descoberta de novos medicamentos, vacinas e tratamentos a partir de substâncias presentes em plantas, animais e microrganismos.
+            * **Agricultura e Alimentação:** Desenvolvimento de novas variedades de culturas mais resistentes a pragas, secas ou com maior valor nutricional. A segurança alimentar global depende da manutenção da diversidade genética de plantas cultivadas e animais domesticados.
+            * **Biocombustíveis e Biotecnologia:** Fonte de enzimas, genes e processos biológicos para o desenvolvimento de novas tecnologias e produtos.
+            * **Indústria:** Criação de novos materiais, cosméticos, produtos de limpeza, etc.
+        * **Resiliência dos Ecossistemas:** Ecossistemas com maior diversidade genética são mais robustos e capazes de se recuperar de distúrbios e mudanças ambientais.
+
+        **Ameaças e Proteção:**
+        O patrimônio genético está sob crescente ameaça devido a:
+        * **Perda de Biodiversidade:** Causada pelo desmatamento, destruição de habitats, poluição, mudanças climáticas e superexploração de espécies.
+        * **Biotecnologia e Biopirataria:** O uso indevido e o acesso não autorizado a recursos genéticos de um país ou comunidade, sem a devida repartição de benefícios, é um problema sério, especialmente em países megadiversos como o Brasil.
+
+        A proteção do patrimônio genético envolve a conservação de áreas naturais, a criação de bancos de germoplasma (sementes, genes), a pesquisa e o desenvolvimento de marcos legais para o acesso e a repartição de benefícios. A conscientização sobre o valor incalculável desses recursos é crucial para garantir que as futuras gerações também possam se beneficiar da riqueza biológica do planeta.`,
+        quiz: [
+          {
+            pergunta: "O que o conceito de 'patrimônio genético' abrange?",
+            opcoes: ["Apenas os fósseis antigos", "Apenas a herança cultural de um povo", "A totalidade de informações genéticas de todas as espécies de seres vivos", "A propriedade privada de empresas de biotecnologia"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual a importância da diversidade genética para as espécies?",
+            opcoes: ["Impede a evolução", "Diminui a resistência a doenças", "Permite a adaptação a mudanças ambientais e a resiliência", "Torna as espécies mais vulneráveis"],
+            correta: 2
+          },
+          {
+            pergunta: "O patrimônio genético é uma fonte inestimável de recursos para qual área da humanidade?",
+            opcoes: ["Apenas para a indústria bélica", "Apenas para o entretenimento", "Medicina, agricultura, biotecnologia e indústria", "Somente para a exploração mineral"],
+            correta: 2
+          },
+          {
+            pergunta: "A 'biopirataria' é uma ameaça ao patrimônio genético que envolve:",
+            opcoes: ["A conservação de espécies em cativeiro", "O acesso não autorizado e uso indevido de recursos genéticos sem repartição de benefícios", "O desenvolvimento de novas vacinas", "A criação de bancos de sementes"],
+            correta: 1
+          },
+          {
+            pergunta: "Qual das seguintes ações contribui para a proteção do patrimônio genético?",
+            opcoes: ["Desmatamento e destruição de habitats", "Poluição de rios e solos", "Criação de bancos de germoplasma e conservação de áreas naturais", "Superexploração de espécies"],
+            correta: 2
+          }
+        ]
+      },
+      'geo-meioAmbienteNoBrasil': {
+        titulo: "Meio Ambiente no Brasil",
+        texto: `O Brasil é um país de **megabiodiversidade**, abrigando uma das maiores riquezas naturais do planeta. Possui diversos biomas (como Amazônia, Mata Atlântica, Cerrado, Caatinga, Pampa e Pantanal), que contêm uma variedade inigualável de espécies de flora e fauna, além de vastos recursos hídricos e minerais. Essa riqueza, no entanto, é acompanhada por enormes desafios ambientais.
+
+        **Principais características e desafios no Brasil:**
+        * **Amazônia:** A maior floresta tropical do mundo, vital para o equilíbrio climático global e com uma biodiversidade imensa. Sofre com o **desmatamento** ilegal (para pecuária, agricultura, extração de madeira), **garimpo ilegal** (contaminando rios com mercúrio), e **queimadas**.
+        * **Mata Atlântica:** Bioma costeiro que já cobriu grande parte do litoral brasileiro, hoje reduzido a fragmentos. É um dos biomas mais ameaçados do mundo devido à urbanização e à agricultura.
+        * **Cerrado:** A savana brasileira, rica em biodiversidade e importante para a recarga de aquíferos. Sofre com a expansão da fronteira agrícola (soja e gado).
+        * **Recursos Hídricos:** O Brasil possui a maior reserva de água doce do mundo, mas a poluição dos rios e mananciais, o desperdício e a má distribuição da água são problemas crescentes, levando à escassez em algumas regiões.
+        * **Desmatamento e Queimadas:** São problemas crônicos em vários biomas, liberando grandes quantidades de gases de efeito estufa na atmosfera e contribuindo para as mudanças climáticas e a perda de biodiversidade.
+        * **Poluição Urbana e Industrial:** Grandes centros urbanos enfrentam poluição do ar (veículos, indústrias) e da água (esgoto sem tratamento), afetando a saúde da população. A mineração também causa impactos ambientais significativos.
+        * **Legislação Ambiental:** O Brasil possui uma legislação ambiental robusta (como a Lei de Crimes Ambientais e o Código Florestal), mas a fiscalização e o cumprimento das leis ainda são grandes desafios.
+
+        **Importância da Conservação:**
+        A conservação do meio ambiente no Brasil é crucial não apenas para o país, mas para o planeta. A proteção da Amazônia, por exemplo, é fundamental para regular o clima global. O uso sustentável dos recursos, o combate ao desmatamento e à poluição, o investimento em energias limpas e a educação ambiental são ações essenciais para garantir a sustentabilidade e a qualidade de vida das futuras gerações brasileiras.`,
+        quiz: [
+          {
+            pergunta: "Qual a classificação do Brasil em relação à sua biodiversidade?",
+            opcoes: ["País de baixa biodiversidade", "País de megabiodiversidade", "País com poucas espécies endêmicas", "País com ecossistemas homogêneos"],
+            correta: 1
+          },
+          {
+            pergunta: "Qual bioma brasileiro é a maior floresta tropical do mundo e sofre com o desmatamento ilegal?",
+            opcoes: ["Mata Atlântica", "Cerrado", "Caatinga", "Amazônia"],
+            correta: 3
+          },
+          {
+            pergunta: "A poluição dos rios e mananciais no Brasil afeta principalmente:",
+            opcoes: ["A produção de café", "A disponibilidade de água potável", "A fertilidade do solo", "A qualidade do ar nas cidades"],
+            correta: 1
+          },
+          {
+            pergunta: "Qual bioma brasileiro é considerado uma savana, importante para aquíferos e ameaçado pela expansão agrícola?",
+            opcoes: ["Pantanal", "Pampa", "Cerrado", "Mata Atlântica"],
+            correta: 2
+          },
+          {
+            pergunta: "Apesar de ter uma legislação ambiental robusta, qual é um grande desafio para o Brasil?",
+            opcoes: ["Falta de recursos hídricos", "Excesso de biodiversidade", "A fiscalização e o cumprimento das leis", "O baixo interesse da população pela ecologia"],
+            correta: 2
+          }
+        ]
+      },
+      'geo-principaisProblemasAmbientais': {
+        titulo: "Principais Problemas Ambientais",
+        texto: `Os problemas ambientais são as consequências das ações humanas que afetam negativamente o equilíbrio dos ecossistemas e a qualidade de vida no planeta. Eles são interconectados e muitos se agravam mutuamente.
+
+        **Alguns dos principais problemas ambientais incluem:**
+        1.  **Desmatamento:** Consiste na remoção de florestas e vegetação nativa para dar lugar a outras atividades, como agricultura, pecuária, mineração e urbanização.
+            * **Impactos:** Perda de biodiversidade, erosão do solo, desertificação, alterações no regime de chuvas, liberação de gases de efeito estufa (contribuindo para as mudanças climáticas).
+        2.  **Poluição (do Ar, da Água, do Solo):** A contaminação de ecossistemas por substâncias nocivas.
+            * **Poluição do Ar:** Emissão de gases tóxicos e partículas (indústria, veículos, queimadas) que causam doenças respiratórias, chuva ácida e intensificam o efeito estufa.
+            * **Poluição da Água:** Descarte inadequado de esgoto doméstico e industrial, agrotóxicos, plásticos e lixo em rios, lagos e oceanos, contaminando a água potável, a vida aquática e a saúde humana.
+            * **Poluição do Solo:** Acúmulo de lixo, resíduos tóxicos, agrotóxicos e efluentes industriais que afetam a fertilidade do solo, a produção de alimentos e a saúde.
+        3.  **Mudanças Climáticas e Aquecimento Global:** Alterações significativas nos padrões climáticos globais, principalmente devido ao aumento da concentração de gases de efeito estufa na atmosfera por atividades humanas. Isso leva ao aquecimento global, derretimento de geleiras, elevação do nível do mar e eventos climáticos extremos.
+        4.  **Perda de Biodiversidade:** A diminuição acelerada do número de espécies de plantas, animais e microrganismos. Causada pela destruição de habitats, mudanças climáticas, poluição, espécies invasoras e superexploração de recursos. A biodiversidade é vital para a estabilidade dos ecossistemas.
+        5.  **Escassez Hídrica:** A falta de água potável em quantidade e qualidade suficientes para atender às necessidades. Causada pelo crescimento populacional, desperdício, poluição dos mananciais e alterações nos regimes de chuva.
+        6.  **Geração e Má Gestão de Resíduos Sólidos:** O volume crescente de lixo produzido pelas cidades e a falta de infraestrutura adequada para sua coleta, tratamento e descarte (lixões a céu aberto) resultam em poluição ambiental, proliferação de doenças e desperdício de recursos.
+        7.  **Desertificação:** Processo de degradação da terra em regiões áridas, semiáridas e subúmidas, tornando-as improdutivas. Causada por desmatamento, uso inadequado do solo, secas e mudanças climáticas.
+
+        O enfrentamento desses problemas requer uma abordagem global, com ações de mitigação (redução das causas) e adaptação (preparação para os impactos), políticas públicas, inovações tecnológicas e, sobretudo, a conscientização e a mudança de hábitos de consumo de toda a sociedade.`,
+        quiz: [
+          {
+            pergunta: "Qual das seguintes atividades humanas é uma das principais causas do desmatamento?",
+            opcoes: ["Reciclagem de lixo", "Agricultura e pecuária", "Uso de energia solar", "Economia de água"],
+            correta: 1
+          },
+          {
+            pergunta: "A emissão de gases tóxicos por indústrias e veículos causa principalmente qual tipo de poluição?",
+            opcoes: ["Poluição da água", "Poluição do solo", "Poluição sonora", "Poluição do ar"],
+            correta: 3
+          },
+          {
+            pergunta: "O Aquecimento Global e eventos climáticos extremos são consequências de qual problema ambiental?",
+            opcoes: ["Erosão do solo", "Perda de biodiversidade", "Mudanças Climáticas", "Escassez de minerais"],
+            correta: 2
+          },
+          {
+            pergunta: "A diminuição acelerada do número de espécies de plantas e animais é conhecida como:",
+            opcoes: ["Crescimento populacional", "Urbanização descontrolada", "Perda de Biodiversidade", "Aumento da biomassa"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual o principal impacto da má gestão de resíduos sólidos (lixo)?",
+            opcoes: ["Melhora da qualidade do ar", "Aumento da reciclagem", "Poluição ambiental e proliferação de doenças", "Criação de novos habitats"],
+            correta: 2
+          }
+        ]
+      },
+      'geo-principaisDestinosRequisitosSolidos': {
+        titulo: "Principais Destinos e Requisitos para Resíduos Sólidos",
+        texto: `A gestão adequada dos **resíduos sólidos** (lixo) é um dos maiores desafios ambientais e de saúde pública no mundo. O destino final do lixo e os requisitos para seu tratamento e descarte são cruciais para minimizar impactos ambientais e proteger a saúde humana.
+
+        **Principais Destinos de Resíduos Sólidos:**
+
+        1.  **Aterros Sanitários:** São locais projetados para o descarte controlado do lixo. Possuem sistemas de impermeabilização do solo (mantas geotêxteis e argila) para evitar a contaminação do lençol freático, sistemas de coleta e tratamento de chorume (líquido poluente gerado pela decomposição do lixo) e de gás metano (biogás), que pode ser capturado e utilizado como fonte de energia. São a opção mais ambientalmente segura para o descarte final do lixo que não pode ser reciclado ou compostado.
+        2.  **Lixões a Céu Aberto (Vazadouros):** São o destino mais inadequado e ambientalmente danoso para o lixo. Não possuem qualquer tipo de controle, causando:
+            * **Contaminação do solo e da água:** Chorume escorre livremente, poluindo o solo e os lençóis freáticos.
+            * **Proliferação de vetores:** Atraem ratos, insetos, urubus, que transmitem doenças.
+            * **Emissão de gases:** Geram gases de efeito estufa (metano) e odores desagradáveis sem controle.
+            * **Impacto social:** Marginalização de catadores em condições insalubres.
+        3.  **Aterros Controlados:** Uma solução intermediária entre o lixão e o aterro sanitário. Há algum controle do material depositado (cobertura diária da área), mas geralmente não possuem sistemas de tratamento de chorume e gás tão eficientes quanto os aterros sanitários.
+        4.  **Incineração:** Processo de queima do lixo em altas temperaturas. Reduz drasticamente o volume do resíduo e pode gerar energia.
+            * **Vantagens:** Redução de volume, geração de energia.
+            * **Desvantagens:** Emissão de poluentes atmosféricos (dioxinas, furanos) se não houver sistemas de controle de poluição avançados.
+        5.  **Compostagem:** Processo biológico de decomposição de matéria orgânica (restos de alimentos, podas de jardim) para transformá-la em adubo orgânico (composto).
+            * **Vantagens:** Reduz o volume de lixo enviado para aterros, produz adubo rico em nutrientes, diminui a emissão de metano.
+            * **Requisito:** Separação na fonte da matéria orgânica.
+        6.  **Reciclagem:** Processo de reintrodução de materiais descartados (papel, plástico, vidro, metal) no ciclo produtivo, transformando-os em novos produtos.
+
+        **Requisitos para uma Boa Gestão de Resíduos Sólidos:**
+        * **Redução, Reutilização, Reciclagem (3 Rs):** Priorizar a diminuição da geração de lixo, a reutilização de produtos e a reciclagem.
+        * **Coleta Seletiva:** Separação do lixo na fonte para facilitar a reciclagem e a compostagem.
+        * **Tratamento Adequado:** Utilização de tecnologias para tratar o lixo (compostagem, incineração com controle) antes do descarte final.
+        * **Descarte Final em Aterros Sanitários:** O que não pode ser tratado ou reciclado deve ser disposto de forma segura.
+        * **Legislação e Fiscalização:** Políticas públicas que incentivem a gestão sustentável e punam o descarte irregular.
+
+        A Política Nacional de Resíduos Sólidos (PNRS) no Brasil, por exemplo, estabelece a responsabilidade compartilhada pelo ciclo de vida dos produtos e a prioridade da não geração, redução, reutilização, reciclagem, tratamento e, por último, a disposição ambientalmente adequada dos rejeitos em aterros sanitários.`,
+        quiz: [
+          {
+            pergunta: "Qual o destino mais ambientalmente seguro para o descarte final do lixo que não pode ser reciclado?",
+            opcoes: ["Lixões a céu aberto", "Rios e mares", "Aterros sanitários", "Queimadas clandestinas"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual dos seguintes destinos de resíduos sólidos NÃO possui qualquer controle e é altamente prejudicial ao meio ambiente?",
+            opcoes: ["Aterros sanitários", "Incineração controlada", "Lixões a céu aberto", "Compostagem"],
+            correta: 2
+          },
+          {
+            pergunta: "O processo de decomposição de matéria orgânica para produzir adubo é chamado de:",
+            opcoes: ["Reciclagem", "Incineração", "Aterro controlado", "Compostagem"],
+            correta: 3
+          },
+          {
+            pergunta: "Qual dos '3 Rs' da sustentabilidade prioriza a diminuição da quantidade de lixo gerada?",
+            opcoes: ["Reciclagem", "Reutilização", "Redução", "Reforma"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual é o principal problema causado pelo chorume dos lixões a céu aberto?",
+            opcoes: ["Geração de energia", "Contaminação do solo e da água", "Emissão de oxigênio", "Aumento da biodiversidade local"],
+            correta: 1
+          }
+        ]
+      },
+      'geo-importanciaReciclagemConsumoConsciente': {
+        titulo: "Importância da Reciclagem e Consumo Consciente",
+        texto: `A **reciclagem** e o **consumo consciente** são pilares fundamentais para a sustentabilidade e para a minimização dos impactos ambientais de nossas sociedades. São práticas que promovem a economia circular, a conservação de recursos naturais e a redução da poluição.
+
+        **Importância da Reciclagem:**
+        A reciclagem é o processo de transformar materiais que seriam descartados (lixo) em novos produtos, reintroduzindo-os no ciclo produtivo.
+        * **Economia de Recursos Naturais:** Reduz a necessidade de extração de novas matérias-primas. Ex: reciclar papel poupa árvores; reciclar alumínio economiza energia.
+        * **Redução da Poluição:** Diminui o volume de lixo enviado para aterros (prolongando sua vida útil) e a poluição do ar, da água e do solo associada à produção de materiais virgens e ao descarte inadequado.
+        * **Economia de Energia:** A produção de materiais a partir de reciclados geralmente consome menos energia do que a partir de matérias-primas virgens.
+        * **Geração de Empregos e Renda:** A cadeia da reciclagem (coleta, triagem, processamento) gera oportunidades de trabalho.
+        * **Contribuição para o Clima:** Reduz a emissão de gases de efeito estufa, pois evita a decomposição de matéria orgânica em aterros (que gera metano) e a energia gasta na produção de novos materiais.
+
+        **Consumo Consciente:**
+        O consumo consciente é a prática de fazer escolhas de consumo mais responsáveis e sustentáveis, considerando o impacto social, econômico e ambiental da produção, uso e descarte dos produtos e serviços. Vai além da reciclagem e envolve uma mudança de mentalidade e hábitos.
+        * **Redução (da necessidade):** Pensar antes de comprar: Eu realmente preciso disso? Posso usar o que já tenho?
+        * **Reutilização:** Dar nova vida a produtos ou embalagens antes de descartá-los. Ex: sacolas retornáveis, potes de vidro.
+        * **Escolha de Produtos:** Optar por produtos com menor impacto ambiental (reciclados, duráveis, orgânicos, de empresas sustentáveis), que apoiem o comércio justo e a produção local.
+        * **Descarte Correto:** Garantir que o que não pode ser reutilizado ou reciclado seja descartado de forma ambientalmente adequada.
+        * **Engajamento:** Apoiar políticas públicas e iniciativas que promovam a sustentabilidade.
+
+        A combinação de reciclagem eficiente e consumo consciente é essencial para criar um futuro mais sustentável, onde os recursos do planeta são utilizados de forma responsável e o desperdício é minimizado, garantindo a qualidade de vida para as gerações presentes e futuras.`,
+        quiz: [
+          {
+            pergunta: "Qual o principal benefício da reciclagem para o meio ambiente?",
+            opcoes: ["Aumento da extração de matérias-primas", "Redução da necessidade de extração de recursos naturais e da poluição", "Aumento da geração de lixo", "Consumo excessivo de energia"],
+            correta: 1
+          },
+          {
+            pergunta: "A produção de materiais a partir de reciclados geralmente consome ________ energia do que a partir de matérias-primas virgens.",
+            opcoes: ["Mais", "A mesma quantidade de", "Menos", "Nenhuma"],
+            correta: 2
+          },
+          {
+            pergunta: "O que significa 'consumo consciente'?",
+            opcoes: ["Comprar tudo o que se deseja", "Não pensar nos impactos sociais e ambientais das compras", "Fazer escolhas de consumo responsáveis, considerando os impactos", "Descartar o lixo em qualquer lugar"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual dos '3 Rs' está mais ligado à ideia de 'pensar antes de comprar' e diminuir a quantidade de produtos?",
+            opcoes: ["Reutilização", "Reciclagem", "Redução", "Reforma"],
+            correta: 2
+          },
+          {
+            pergunta: "Qual o impacto da reciclagem na emissão de gases de efeito estufa?",
+            opcoes: ["Aumenta as emissões", "Não tem impacto", "Reduz as emissões", "Gera novos gases poluentes"],
+            correta: 2
+          }
+        ]
+      },
+      // Aqui ainda faltam os conteúdos e quizzes para:
+      // Sociologia: Bullying e Cyberbullying, Abuso e Exploração Sexual
+      // Adicionar ao seu objeto 'conteudos' existente
+'geo-principaisProblemasAmbientais': {
+    titulo: "Principais Problemas Ambientais",
+    texto: `
+        Os **problemas ambientais** são desafios complexos que afetam o equilíbrio dos ecossistemas e a qualidade de vida no planeta. Eles são, em sua maioria, resultado das atividades humanas e do modelo de desenvolvimento insustentável. A seguir, alguns dos mais críticos:
+
+        1.  **Desmatamento e Queimadas:** Consiste na remoção da cobertura vegetal original, principalmente florestas, para dar lugar a áreas de agricultura, pecuária, mineração ou urbanização. As queimadas, muitas vezes associadas ao desmatamento, liberam grandes quantidades de CO2 na atmosfera, contribuindo para o aquecimento global e destruindo a biodiversidade. Consequências incluem perda de biodiversidade, erosão do solo, desertificação e alterações climáticas.
+
+        2.  **Poluição (do Ar, da Água, do Solo):**
+            * **Poluição do Ar:** Emissão de gases poluentes por indústrias, veículos, queimadas e queima de combustíveis fósseis. Causa problemas respiratórios, chuva ácida e contribui para o efeito estufa.
+            * **Poluição da Água:** Descarte inadequado de esgoto doméstico e industrial sem tratamento, agrotóxicos, resíduos sólidos e metais pesados em rios, lagos e oceanos. Afeta a vida aquática e o abastecimento de água potável.
+            * **Poluição do Solo:** Descarte incorreto de resíduos sólidos (lixo) e uso excessivo de agrotóxicos e produtos químicos na agricultura, contaminando o solo e afetando a cadeia alimentar.
+
+        3.  **Perda de Biodiversidade:** A extinção de espécies de plantas e animais, causada pela destruição de habitats, caça predatória, poluição, introdução de espécies exóticas e mudanças climáticas. Compromete serviços ecossistêmicos essenciais.
+
+        4.  **Aquecimento Global e Mudanças Climáticas:** O aumento da temperatura média da Terra devido à intensificação do efeito estufa, causada principalmente pela emissão de gases como CO2 e metano. Leva ao derretimento de geleiras, elevação do nível do mar e eventos climáticos extremos.
+
+        O combate a esses problemas exige ações globais e locais, como a transição para energias renováveis, o consumo consciente, a reciclagem, o saneamento básico, a fiscalização ambiental e a promoção de práticas agrícolas sustentáveis.
+    `,
+    quiz: [
+        {
+            pergunta: "Qual dos problemas ambientais abaixo está mais diretamente ligado à expansão da agropecuária e mineração?",
+            opcoes: [
+                "A) Poluição sonora.",
+                "B) Desmatamento.",
+                "C) Eutrofização de rios.",
+                "D) Chuva ácida."
+            ],
+            correta: 1 // Índice 1 corresponde à opção 'B'
+        },
+        {
+            pergunta: "A poluição da água é frequentemente causada pelo descarte inadequado de qual elemento?",
+            opcoes: [
+                "A) Oxigênio.",
+                "B) Energia solar.",
+                "C) Esgoto doméstico e industrial.",
+                "D) Vento."
+            ],
+            correta: 2 // Índice 2 corresponde à opção 'C'
+        },
+        {
+            pergunta: "O aumento da temperatura média da Terra devido à intensificação do efeito estufa é conhecido como:",
+            opcoes: [
+                "A) Resfriamento global.",
+                "B) Aquecimento global.",
+                "C) Erosão do solo.",
+                "D) Biopirataria."
+            ],
+            correta: 1 // Índice 1 corresponde à opção 'B'
+        }
+    ]
+},
+      // Adicionar ao seu objeto 'conteudos' existente
+'geo-principaisDestinosRequisitos': {
+    titulo: "Principais Destinos e Requisitos Sólidos",
+    texto: `
+        O turismo internacional e a mobilidade global dependem de uma série de fatores, incluindo a atratividade dos destinos e os requisitos burocráticos para a entrada de visitantes. Entender esses requisitos é crucial para planejar viagens e para compreender os fluxos migratórios e turísticos no mundo.
+
+        ### Principais Destinos Turísticos Globais
+
+        Os destinos turísticos mais procurados globalmente variam anualmente, mas alguns se mantêm consistentemente no topo devido à sua cultura, história, belezas naturais, infraestrutura ou eventos. Entre eles, destacam-se:
+        * **França (Paris):** Conhecida pela Torre Eiffel, museus e culinária.
+        * **Espanha (Barcelona, Madri):** Rica em arte, arquitetura e praias.
+        * **Estados Unidos (Nova Iorque, Flórida, Califórnia):** Oferece desde grandes metrópoles a parques temáticos e paisagens naturais diversas.
+        * **China (Grande Muralha, Xangai):** Com sua história milenar e cidades modernas.
+        * **Itália (Roma, Florença, Veneza):** Berço da civilização ocidental, arte e gastronomia.
+        * **Turquia (Istambul, Capadócia):** Ponto de encontro de culturas orientais e ocidentais.
+        * **México (Cancun, Cidade do México):** Praias paradisíacas e rica herança cultural.
+
+        Esses destinos atraem milhões de visitantes, impulsionando suas economias locais e nacionais.
+
+        ### Requisitos Sólidos para Viagens Internacionais
+
+        Os "**requisitos sólidos**" para a entrada em um país referem-se aos documentos e condições indispensáveis exigidos pelas autoridades de imigração. Eles podem variar significativamente de acordo com a nacionalidade do viajante e o país de destino. Os principais incluem:
+
+        1.  **Passaporte Válido:** É o documento de identificação internacional mais fundamental. Muitos países exigem que ele tenha validade mínima de 6 meses a partir da data de entrada.
+
+        2.  **Visto:** Dependendo da nacionalidade e do destino, pode ser necessário obter um visto previamente. Vistos são autorizações de entrada que podem ser para turismo, estudo, trabalho, etc.
+
+        3.  **Passagens de Ida e Volta:** Comprovar a intenção de retornar ao país de origem ou seguir para outro destino é um requisito comum para evitar a permanência ilegal.
+
+        4.  **Comprovação de Meios Financeiros:** Apresentar provas de que possui recursos suficientes para se manter durante a estadia, seja através de extratos bancários, cartões de crédito ou cartas-convite.
+
+        5.  **Seguro Viagem:** Obrigatório em alguns destinos (como a Área Schengen na Europa), o seguro viagem garante cobertura para despesas médicas e outras emergências.
+
+        6.  **Comprovante de Hospedagem:** Reservas de hotéis, cartas-convite de anfitriões ou outros arranjos de acomodação.
+
+        7.  **Certificado Internacional de Vacinação:** Para alguns países, especialmente na África, Ásia e América do Sul, a vacina contra febre amarela (e seu certificado) é obrigatória.
+
+        A pesquisa e o planejamento prévio são essenciais para garantir que todos os requisitos sejam cumpridos e evitar problemas na entrada em outros países.
+    `,
+    quiz: [
+        {
+            pergunta: "Qual documento é considerado o mais fundamental para viagens internacionais?",
+            opcoes: [
+                "A) Carteira de motorista.",
+                "B) RG (Identidade Nacional).",
+                "C) Passaporte Válido.",
+                "D) Cartão de crédito."
+            ],
+            correta: 2 // Índice 2 corresponde à opção 'C'
+        },
+        {
+            pergunta: "O que é um visto em termos de requisitos de viagem?",
+            opcoes: [
+                "A) Um tipo de seguro saúde.",
+                "B) Uma autorização eletrônica de viagem para todos os países.",
+                "C) Uma autorização de entrada em um país, emitida previamente.",
+                "D) O comprovante de passagens de ida e volta."
+            ],
+            correta: 2 // Índice 2 corresponde à opção 'C'
+        },
+        {
+            pergunta: "Qual dos itens abaixo é frequentemente um requisito para comprovar a intenção de retornar ao país de origem?",
+            opcoes: [
+                "A) Certificado de vacinação.",
+                "B) Comprovante de hospedagem.",
+                "C) Passagens de ida e volta.",
+                "D) Seguro viagem."
+            ],
+            correta: 2 // Índice 2 corresponde à opção 'C'
+        }
+    ]
+}
+    };
+
+    function abrirConteudo(chave) {
+      const c = conteudos[chave];
+      const conteudoDiv = document.getElementById('conteudo');
+
+      if (!c) {
+        conteudoDiv.innerHTML = '<h2>Conteúdo não encontrado.</h2><button onclick="fecharConteudo()">Fechar</button>';
+        conteudoDiv.style.display = 'block';
+        return;
+      }
+
+      estudados[chave] = true;
+      quizAtual = c.quiz;
+      perguntaAtualIndex = 0;
+
+      function exibirPergunta() {
+        const pergunta = quizAtual[perguntaAtualIndex];
+        let quizHtml = `
+          <h3>Quiz - ${c.titulo} (Pergunta ${perguntaAtualIndex + 1} de ${quizAtual.length})</h3>
+          <p>${pergunta.pergunta}</p>
+          <div class="opcoes-quiz">
+        `;
+        pergunta.opcoes.forEach((opcao, index) => {
+          quizHtml += `<button onclick="verificarResposta(${index})">${opcao}</button>`;
+        });
+        quizHtml += `</div>
+          <p id="feedback"></p>
+          <div class="quiz-navigation">
+            ${perguntaAtualIndex > 0 ? '<button onclick="perguntaAnterior()">Anterior</button>' : ''}
+            ${perguntaAtualIndex < quizAtual.length - 1 ? '<button onclick="proximaPergunta()">Próxima</button>' : '<button onclick="finalizarQuiz()">Finalizar Quiz</button>'}
+          </div>
+        `;
+        return quizHtml;
+      }
+
+      function verificarResposta(respostaSelecionada) {
+        const pergunta = quizAtual[perguntaAtualIndex];
+        const feedbackDiv = document.getElementById('feedback');
+        const buttons = document.querySelectorAll('.opcoes-quiz button');
+
+        buttons.forEach((btn, index) => {
+          btn.disabled = true; // Desabilita botões após a resposta
+          if (index === pergunta.correta) {
+            btn.style.backgroundColor = '#4CAF50'; // Verde para a correta
+          } else if (index === respostaSelecionada) {
+            btn.style.backgroundColor = '#f44336'; // Vermelho para a errada selecionada
+          }
+        });
+
+        if (respostaSelecionada === pergunta.correta) {
+          feedbackDiv.textContent = 'Correto!';
+          feedbackDiv.style.color = '#4CAF50';
+        } else {
+          feedbackDiv.textContent = `Incorreto. A resposta correta era: ${pergunta.opcoes[pergunta.correta]}.`;
+          feedbackDiv.style.color = '#f44336';
+        }
+      }
+
+      function proximaPergunta() {
+        if (perguntaAtualIndex < quizAtual.length - 1) {
+          perguntaAtualIndex++;
+          renderizarConteudo(c.titulo, c.texto, exibirPergunta());
+        }
+      }
+
+      function perguntaAnterior() {
+        if (perguntaAtualIndex > 0) {
+          perguntaAtualIndex--;
+          renderizarConteudo(c.titulo, c.texto, exibirPergunta());
+        }
+      }
+
+      function finalizarQuiz() {
+        alert("Quiz finalizado! Você pode revisar suas respostas.");
+        // Opcional: Adicionar lógica de pontuação aqui
+        fecharConteudo();
+      }
+
+      function renderizarConteudo(titulo, texto, quizHtml) {
+        conteudoDiv.innerHTML = `
+          <h2>${titulo}</h2>
+          <p>${texto}</p>
+          <div class="quiz-container">
+            ${quizHtml}
+          </div>
+          <button onclick="fecharConteudo()">Fechar</button>
+        `;
+        conteudoDiv.style.display = 'block';
+      }
+
+      renderizarConteudo(c.titulo, c.texto, exibirPergunta());
+
+      // Expor funções para o escopo global para que os onclicks funcionem
+      window.verificarResposta = verificarResposta;
+      window.proximaPergunta = proximaPergunta;
+      window.perguntaAnterior = perguntaAnterior;
+      window.finalizarQuiz = finalizarQuiz;
+    }
+
+    function fecharConteudo() {
+      document.getElementById('conteudo').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
