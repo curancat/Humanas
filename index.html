@@ -2,93 +2,109 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Mapa do Conhecimento</title>
+  <title>Estudos para as provas de humanas 3 ano</title> <!---sofri nessa prova--->
   <style>
-    body {
-      background: linear-gradient(to bottom right, #f5deb3, #d2b48c, #cd853f);
-      background-attachment: fixed;
-      font-family: "Georgia", serif;
-      color: #4a2c0f;
-      margin: 0;
-      padding: 0;
-    }
-    #mapa {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      /* Ajuste para garantir que haja espaço para os pontos sem scroll inicial */
-      min-height: 700px; /* Um valor mínimo para começar */
-    }
-    .ponto {
-      position: absolute;
-      cursor: pointer;
-      font-weight: bold;
-      background: rgba(255, 248, 220, 0.9);
-      border: 2px solid #5a3e1b;
-      padding: 5px 10px;
-      border-radius: 8px;
-      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
-      transition: transform 0.2s;
-      color: #4a2c0f;
-      text-align: center;
-      white-space: nowrap; /* Evita quebras de linha no nome do ponto */
-      font-size: 0.9em; /* Tamanho da fonte menor para caber mais nomes */
-    }
-    .ponto:hover {
-      transform: scale(1.1);
-      z-index: 10; /* Garante que o ponto em foco esteja acima dos outros */
-    }
-    #conteudo {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      max-height: 50vh;
-      overflow-y: auto;
-      background-color: rgba(245, 222, 179, 0.95);
-      padding: 20px;
-      border-top: 4px solid #5a3e1b;
-      display: none;
-      box-sizing: border-box;
-      z-index: 20; /* Garante que o conteúdo apareça acima do mapa */
-    }
-    #conteudo h2 {
-      color: #5a3e1b;
-      margin-top: 0;
-    }
-    #conteudo p {
-      line-height: 1.6;
-    }
-    .quiz-container {
-      margin-top: 20px;
-      border-top: 1px dashed #5a3e1b;
-      padding-top: 15px;
-    }
-    .quiz-container button {
-        display: block;
-        width: 100%;
-        margin-bottom: 5px;
-        background-color: #8b5e3c;
-        color: #fff;
-        border: none;
-        padding: 10px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 1em;
-        transition: background-color 0.2s;
-    }
-    .quiz-container button:hover {
-        background-color: #6a442a;
-    }
-    .quiz-navigation button {
-        background-color: #5a3e1b;
-        margin-right: 10px;
-        width: auto;
-        padding: 8px 15px; /* Ajuste no padding para botões de navegação */
-    }
-    .quiz-navigation button:hover {
-        background-color: #3b2816;
-    }
+body {
+  background: linear-gradient(to bottom right, #f5deb3, #d2b48c, #cd853f);
+  background-attachment: fixed;
+  font-family: "Georgia", serif;
+  color: #4a2c0f;
+  margin: 0;
+  padding: 0;
+}
+
+
+#mapa {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  min-height: 700px;
+
+}
+    
+.ponto {
+  position: absolute;
+  cursor: pointer;
+  font-weight: bold;
+  background: rgba(255, 248, 220, 0.9);
+  border: 2px solid #5a3e1b;
+  padding: 5px 10px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s;
+  color: #4a2c0f;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 0.9em; 
+}
+
+.ponto:hover {
+  transform: scale(1.1);
+  z-index: 10; 
+}
+
+
+#conteudo {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  max-height: 50vh;
+  overflow-y: auto;
+  background-color: rgba(245, 222, 179, 0.95);
+  padding: 20px;
+  border-top: 4px solid #5a3e1b;
+  display: none;
+  box-sizing: border-box;
+  z-index: 20; 
+}
+
+#conteudo h2 {
+  color: #5a3e1b;
+  margin-top: 0;
+}
+
+#conteudo p {
+  line-height: 1.6;
+}
+
+
+.quiz-container {
+  margin-top: 20px;
+  border-top: 1px dashed #5a3e1b;
+  padding-top: 15px;
+}
+
+.quiz-container button {
+  display: block;
+  width: 100%;
+  margin-bottom: 5px;
+  background-color: #8b5e3c;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.2s;
+}
+
+.quiz-container button:hover {
+  background-color: #6a442a;
+}
+
+
+.quiz-navigation button {
+  background-color: #5a3e1b;
+  margin-right: 10px;
+  width: auto;
+  padding: 8px 15px;
+}
+
+.quiz-navigation button:hover {
+  background-color: #3b2816;
+}
+    
   </style>
 </head>
 <body>
